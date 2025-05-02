@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Count the Apples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #fbc2eb, #a6c1ee);
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: #e91e63;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    #instruction {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    .apples {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .apple {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/590/590685.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .apple.clicked {
+      transform: scale(1.2);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .popup {
+      background-color: #ffffff;
+      color: #4caf50;
+      padding: 15px 25px;
+      font-size: 1.3rem;
+      border-radius: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      margin-top: 20px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .btn.play-again {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn.next {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn.skip {
+      background-color: #ff9800;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Count from 1 to 5</h2>
+  <p id="instruction"><strong>Instruction:</strong> Count the apples by clicking on each one.</p>
+
+  <div class="apples">
+    <div class="apple" onclick="countApple(this)"></div>
+    <div class="apple" onclick="countApple(this)"></div>
+    <div class="apple" onclick="countApple(this)"></div>
+    <div class="apple" onclick="countApple(this)"></div>
+    <div class="apple" onclick="countApple(this)"></div>
+  </div>
+
+  <div class="popup" id="feedback">Let's begin! 🍎</div>
+
+  <div class="btn-group">
+    <button class="btn play-again" onclick="resetApples()">🔁 Play Again</button>
+    <button class="btn next" onclick="nextRound()">➡️ Next</button>
+    <button class="btn skip" onclick="skipRound()">⏭️ Skip</button>
+  </div>
+
+  <script>
+    let count = 0;
+
+    function countApple(element) {
+      if (!element.classList.contains('clicked')) {
+        element.classList.add('clicked');
+        count++;
+      }
+
+      const feedback = document.getElementById("feedback");
+
+      if (count === 5) {
+        feedback.textContent = "Fantastic! You counted all five apples! 🍏";
+        feedback.style.color = "#4caf50";
+      } else {
+        feedback.textContent = `Good job! You clicked ${count} apple${count > 1 ? 's' : ''}. Keep going! 🍎`;
+        feedback.style.color = "#ff9800";
+      }
+    }
+
+    function resetApples() {
+      const apples = document.querySelectorAll('.apple');
+      apples.forEach(apple => {
+        apple.classList.remove('clicked');
+      });
+      count = 0;
+      const feedback = document.getElementById("feedback");
+      feedback.textContent = "Try again! 🍎";
+      feedback.style.color = "#ff6f61";
+    }
+
+    function nextRound() {
+      const feedback = document.getElementById("feedback");
+      feedback.textContent = "Next round coming soon! 🔴";
+      feedback.style.color = "#2196f3";
+    }
+
+    function skipRound() {
+      const feedback = document.getElementById("feedback");
+      feedback.textContent = "You skipped this one! ⏭️";
+      feedback.style.color = "#ff9800";
+    }
+  </script>
+
+</body>
+</html>
