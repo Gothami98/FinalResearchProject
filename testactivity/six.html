@@ -114,7 +114,7 @@
 
   <div class="btn-group">
     <button class="btn play-again" onclick="resetScene()">🔁 Play Again</button>
-    <button class="btn next" onclick="nextRound()">➡️ Next</button>
+    <button class="btn next" onclick="nextAnimal()">➡️ Next</button>
     <button class="btn skip" onclick="skipRound()">⏩ Skip</button>
   </div>
 
@@ -127,6 +127,7 @@
     redCar.addEventListener("click", () => {
       feedback.textContent = "Perfect! You followed the instructions! ✅";
       feedback.style.color = "#4caf50";
+      setTimeout(markSuccessAndNext, 1200);
     });
 
     blueBus.addEventListener("click", incorrectClick);
@@ -142,14 +143,19 @@
       feedback.style.color = "#ff6f61";
     }
 
-    function nextRound() {
-      feedback.textContent = "Next round coming soon! 🔴";
-      feedback.style.color = "#2196f3";
+    function nextAnimal() {
+      window.location.href = 'seven.html';
     }
 
     function skipRound() {
       feedback.textContent = "You skipped this one! ⏭️";
       feedback.style.color = "#ff9800";
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'seven.html';
     }
   </script>
 

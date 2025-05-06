@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root"; // Default username for MySQL
-$password = "Root@1234"; // Default password for MySQL
+$password = ""; // Default password for MySQL
 $dbname = "path_bloomers";
 
 // Create connection

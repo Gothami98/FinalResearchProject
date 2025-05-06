@@ -156,6 +156,7 @@
         feedback.textContent = "Well done! You moved the ball into the basket! 🏀✅";
         feedback.style.color = "#4caf50";
         droppedSuccessfully = true;
+        setTimeout(markSuccessAndNext, 1200);
       }
     });
 
@@ -175,11 +176,22 @@
     function nextRound() {
       feedback.textContent = "Next round coming soon! 🔴";
       feedback.style.color = "#2196f3";
+      window.location.href = 'six.html';
     }
 
     function skipRound() {
       feedback.textContent = "You skipped this one! ⏭️";
       feedback.style.color = "#ff9800";
+    }
+
+    function nextAnimal() {
+      window.location.href = 'six.html';
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'six.html';
     }
   </script>
 

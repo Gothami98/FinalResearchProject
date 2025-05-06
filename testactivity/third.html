@@ -143,7 +143,7 @@
   <!-- Buttons after clicking -->
   <div class="btn-group" id="buttonGroup">
     <button class="btn play-again" onclick="playAgain()">🔁 Play Again</button>
-    <button class="btn next" onclick="nextRound()">➡️ Next</button>
+    <button class="btn next" onclick="nextAnimal()">➡️ Next</button>
     <button class="btn skip" onclick="skipRound()">⏩ Skip</button>
   </div>
 
@@ -164,11 +164,12 @@
     function checkAnswer(color) {
       if (color === 'red') {
         showPopup("Fantastic! You found the red object! 🔴", '#ff6f61');
+        buttonGroup.classList.add("show");
+        setTimeout(markSuccessAndNext, 1200);
       } else {
         showPopup("Look for the red object. Remember, this is red. 🔴", '#ff9800');
+        buttonGroup.classList.add("show");
       }
-
-      buttonGroup.classList.add("show");
     }
 
     function playAgain() {
@@ -176,12 +177,18 @@
       showPopup("Try again! 🏁", '#ff6f61');
     }
 
-    function nextRound() {
-      showPopup("Next round coming soon! 🔴", '#2196f3');
+    function nextAnimal() {
+      window.location.href = 'four.html';
     }
 
     function skipRound() {
       showPopup("You skipped this one! ⏭️", '#ff9800');
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'four.html';
     }
   </script>
 

@@ -93,6 +93,46 @@
       background-color: #ff9800;
       color: white;
     }
+
+    .final-score {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      padding: 40px 30px;
+      text-align: center;
+      margin-top: 30px;
+      animation: fadeIn 1s;
+    }
+    .final-score h2 {
+      color: #4caf50;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+    .final-score .score-box {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #ff6f61;
+      margin: 20px 0;
+      background: #fbc2eb;
+      border-radius: 12px;
+      display: inline-block;
+      padding: 10px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .final-score .btn {
+      background: #2196f3;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+    .final-score .btn:hover {
+      background: #1769aa;
+    }
   </style>
 </head>
 <body>
@@ -106,8 +146,16 @@
 
   <div class="btn-group">
     <button class="btn play-again" onclick="resetColor()">🔁 Try Again</button>
-    <button class="btn next" onclick="nextRound()">➡️ Next</button>
+    <button class="btn next" onclick="markSuccessAndShow()">➡️ Next</button>
     <button class="btn skip" onclick="skipRound()">⏭️ Skip</button>
+  </div>
+
+  <div id="finalScore" class="final-score" style="display:none;">
+    <h2>Congratulations! 🎉</h2>
+    <p>You have completed all activities.</p>
+    <div class="score-box">
+      <span id="scoreValue"></span> / 10
+    </div>
   </div>
 
   <script>
@@ -128,16 +176,25 @@
       feedback.style.color = "#ff6f61";
     }
 
-    function nextRound() {
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = "Next round coming soon! 🔴";
-      feedback.style.color = "#2196f3";
+    function markSuccessAndShow() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      document.getElementById('scoreValue').textContent = score;
+      document.getElementById('finalScore').style.display = 'block';
+      // Optionally hide the activity UI
+      document.querySelector('.btn-group').style.display = 'none';
+      document.querySelector('.picture').style.display = 'none';
+      document.getElementById('feedback').style.display = 'none';
+      localStorage.removeItem('activityScore');
     }
 
     function skipRound() {
       const feedback = document.getElementById("feedback");
       feedback.textContent = "You skipped this one! ⏭️";
       feedback.style.color = "#ff9800";
+    }
+
+    function restartActivities() {
+      window.location.href = 'first.html';
     }
   </script>
 

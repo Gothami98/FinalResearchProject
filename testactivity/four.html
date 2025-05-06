@@ -169,6 +169,7 @@
       } else if (selectedImage === image) {
         showPopup("Great job! You found the matching pictures! 🐱🐱", '#4caf50');
         buttonGroup.classList.add("show");
+        setTimeout(markSuccessAndNext, 1200);
         selectedImage = null;
       } else {
         showPopup("Try again. Look for the pictures that are the same. 🐱🐱", '#ff9800');
@@ -183,10 +184,21 @@
 
     function nextRound() {
       showPopup("Next round coming soon! 🔴", '#2196f3');
+      window.location.href = 'fifth.html';
     }
 
     function skipRound() {
       showPopup("You skipped this one! ⏭️", '#ff9800');
+    }
+
+    function nextAnimal() {
+      window.location.href = 'fifth.html';
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'fifth.html';
     }
   </script>
 
