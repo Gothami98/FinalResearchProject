@@ -295,7 +295,8 @@
         <div class="col-md-6">
           <div id="para1" class="paragraph-box"></div>
           <button id="startButton" class="start-btn" onclick="navigateToDashboard()">Let's Start</button>
-          <audio id="startSound" src="Audio/button-2-214383.mp3"></audio> <!-- Replace with your sound -->
+          <button id="speakButton" class="start-btn" style="background-color: #4CAF50; margin-right: 10px;">Listen to Instructions</button>
+          <audio id="startSound" src="Audio/button-2-214383.mp3"></audio>
         </div>
       </div>
     </div>
@@ -307,11 +308,54 @@
   <!-- Typing + Button Script -->
   <script>
     const paragraphs = [
-      "Let’s begin by testing your child's knowledge.\n\nOur goal is to provide them with the right support and guidance as they navigate through these questions.\n\nBy doing so, we aim to help them understand the concepts better and ensure they can answer confidently and successfully.\n\nAfter this test, we will assess their current level and tailor the upcoming sessions accordingly to match their learning needs and help them progress further."
+      "Let's begin by testing your child's knowledge. Our goal is to provide them with the right support and guidance as they navigate through these questions. By doing so, we aim to help them understand the concepts better and ensure they can answer confidently and successfully. After this test, we will assess their current level and tailor the upcoming sessions accordingly to match their learning needs and help them progress further."
     ];
+
+    // Split the text into smaller chunks
+    const textChunks = paragraphs[0].split('. ').map(chunk => chunk + '.');
+
+    // Text-to-speech function
+    function speakText() {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      let currentChunk = 0;
+      
+      function speakNextChunk() {
+        if (currentChunk < textChunks.length) {
+          const utterance = new SpeechSynthesisUtterance(textChunks[currentChunk]);
+          
+          // Set voice properties
+          utterance.rate = 0.8;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          // Get available voices and set a female voice if available
+          const voices = window.speechSynthesis.getVoices();
+          const femaleVoice = voices.find(voice => voice.name.includes('Female') || voice.name.includes('female'));
+          if (femaleVoice) {
+            utterance.voice = femaleVoice;
+          }
+          
+          // When this chunk is done, speak the next one
+          utterance.onend = function() {
+            currentChunk++;
+            speakNextChunk();
+          };
+          
+          // Speak the current chunk
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+      
+      // Start speaking the first chunk
+      speakNextChunk();
+    }
 
     function typeText(elementId, text, delay = 0, onComplete = null) {
       const element = document.getElementById(elementId);
+      // Clear any existing text
+      element.textContent = '';
       let i = 0;
       setTimeout(() => {
         const interval = setInterval(() => {
@@ -338,12 +382,34 @@
     // Show button after typing
     function showStartButton() {
       const btn = document.getElementById("startButton");
+      const speakBtn = document.getElementById("speakButton");
       btn.style.display = "inline-block";
+      speakBtn.style.display = "inline-block";
       btn.classList.add("animate-bounce");
+      speakBtn.classList.add("animate-bounce");
     }
 
-    // Start animation
-    typeText("para1", paragraphs[0], 500, showStartButton);
+    // Initialize speech synthesis
+    function initializeSpeech() {
+      // Start animation
+      typeText("para1", paragraphs[0], 500, showStartButton);
+      
+      // Add click handler for speak button
+      document.getElementById("speakButton").addEventListener("click", function() {
+        speakText();
+      });
+    }
+
+    // Wait for voices to be loaded
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = initializeSpeech;
+      if (window.speechSynthesis.getVoices().length > 0) {
+        initializeSpeech();
+      }
+    } else {
+      console.error("Speech synthesis not supported");
+      typeText("para1", paragraphs[0], 500, showStartButton);
+    }
 
     const sun = document.getElementById("sun");
 

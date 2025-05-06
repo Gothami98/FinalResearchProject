@@ -197,7 +197,7 @@
 
   <div class="nav-buttons">
     <button onclick="skipActivity()">⏭ Skip</button>
-    <button onclick="nextActivity()">➡️ Next</button>
+    <button onclick="nextAnimal()">➡️ Next</button>
     <button onclick="playDogSound(); showPopup('Sound replayed! 🔁')">🔁 Play Again</button>
   </div>
 
@@ -223,6 +223,12 @@
       }, 2500);
     }
 
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'third.html';
+    }
+
     function checkAnswer(optionElement, choice) {
       const options = document.querySelectorAll(".option");
       options.forEach(opt => opt.classList.remove("correct", "wrong"));
@@ -230,6 +236,7 @@
       if (choice === "dog") {
         optionElement.classList.add("correct");
         showPopup("Excellent! You matched the sound correctly! 🐶🔊", '#4caf50');
+        setTimeout(markSuccessAndNext, 1200);
       } else {
         optionElement.classList.add("wrong");
         showPopup("Oops! Try again 🐶", '#f44336');
@@ -240,8 +247,8 @@
       showPopup("Skipped this one! ⏭", '#ff9800');
     }
 
-    function nextActivity() {
-      showPopup("Loading next activity... ➡️", '#2196f3');
+    function nextAnimal() {
+      window.location.href = 'third.html';
     }
   </script>
 

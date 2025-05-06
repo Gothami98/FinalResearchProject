@@ -175,11 +175,21 @@ body {
     });
 
     function nextAnimal() {
-      showPopup("Next animal coming soon! 🐾", '#2196f3');
+      window.location.href = 'second.html';
     }
 
     function skipAnimal() {
       showPopup("You skipped this one! ⏭️", '#ff9800');
+    }
+
+    window.onload = function() {
+      localStorage.setItem('activityScore', '0');
+    };
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'second.html';
     }
   </script>
 

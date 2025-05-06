@@ -110,7 +110,7 @@
   <!-- Always-visible buttons -->
   <div class="btn-group">
     <button class="btn play-again" onclick="playAgain()">🔁 Play Again</button>
-    <button class="btn next" onclick="nextRound()">➡️ Next</button>
+    <button class="btn next" onclick="nextAnimal()">➡️ Next</button>
     <button class="btn skip" onclick="skipRound()">⏩ Skip</button>
   </div>
 
@@ -124,6 +124,7 @@
     happy.addEventListener("click", function() {
       feedback.textContent = "Excellent! You recognized the happy face! 😄";
       feedback.style.color = "#4caf50";
+      setTimeout(markSuccessAndNext, 1200);
     });
 
     neutral.addEventListener("click", function() {
@@ -142,16 +143,22 @@
       feedback.style.color = "#ff6f61";
     }
 
-    function nextRound() {
-      feedback.textContent = "Next round coming soon! 🔴";
-      feedback.style.color = "#2196f3";
+    function nextAnimal() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'nine.html';
     }
 
     function skipRound() {
       feedback.textContent = "You skipped this one! ⏭️";
       feedback.style.color = "#ff9800";
     }
-  </script>
 
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'nine.html';
+    }
+  </script>
 </body>
 </html>

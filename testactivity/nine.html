@@ -98,6 +98,12 @@
       background-color: #ff9800;
       color: white;
     }
+
+    .restart-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
   </style>
 </head>
 <body>
@@ -121,6 +127,13 @@
     <button class="btn skip" onclick="skipRound()">⏭️ Skip</button>
   </div>
 
+  <div class="score-box">
+    <span id="scoreValue"></span> / 10
+  </div>
+  <div class="restart-container">
+    <button class="btn" onclick="restartActivities()">Restart</button>
+  </div>
+
   <script>
     let count = 0;
 
@@ -135,6 +148,7 @@
       if (count === 5) {
         feedback.textContent = "Fantastic! You counted all five apples! 🍏";
         feedback.style.color = "#4caf50";
+        setTimeout(markSuccessAndNext, 1200);
       } else {
         feedback.textContent = `Good job! You clicked ${count} apple${count > 1 ? 's' : ''}. Keep going! 🍎`;
         feedback.style.color = "#ff9800";
@@ -156,12 +170,23 @@
       const feedback = document.getElementById("feedback");
       feedback.textContent = "Next round coming soon! 🔴";
       feedback.style.color = "#2196f3";
+      window.location.href = 'ten.html';
     }
 
     function skipRound() {
       const feedback = document.getElementById("feedback");
       feedback.textContent = "You skipped this one! ⏭️";
       feedback.style.color = "#ff9800";
+    }
+
+    function nextAnimal() {
+      window.location.href = 'ten.html';
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'ten.html';
     }
   </script>
 
