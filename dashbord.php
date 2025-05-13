@@ -635,7 +635,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="course-section">
+                <!-- <div class="course-section">
                     <div class="course-card">
                         <div class="course-img">
                             <i class="fas fa-paint-brush"></i>
@@ -645,14 +645,14 @@
                         <p><strong>121 kids enrolled so far!</strong></p>
                         <button class="btn btn-primary">Join Now!</button>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-md-3 right-sidebar">
                 <div class="search-bar">
                     <input type="text" placeholder="Search for courses...">
                     <button class="btn btn-primary">Go</button>
                 </div>
-                <div class="new-courses">
+                <!-- <div class="new-courses">
                     <h3>New Courses</h3>
                     <div class="course-list">
                         <div class="course-item">
@@ -692,7 +692,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="calendar-section">
                     <h3>Calendar</h3>
                     <div class="calendar">

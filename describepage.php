@@ -376,7 +376,7 @@
     }
 
     function navigateToDashboard() {
-      window.location.href = 'testactivity/first.html';
+      window.location.href = 'testactivity/first.php';
     }
 
     // Show button after typing
