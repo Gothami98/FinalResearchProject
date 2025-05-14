@@ -621,13 +621,15 @@
       options.forEach(opt => opt.classList.remove("correct", "wrong"));
 
       if (choice === "dog") {
-        optionElement.classList.add("correct");
-        showPopup("Excellent! You matched the sound correctly! 🐶🔊", '#4caf50');
-        setTimeout(markSuccessAndNext, 1500);
-      } else {
-        optionElement.classList.add("wrong");
-        showPopup("Oops! Try again 🐶", '#f44336');
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
       }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'third.php';
+      }, 1500);
     }
 
  function skipActivity() {
