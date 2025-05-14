@@ -385,24 +385,15 @@
 
       // Check if the selected image matches the target image
       if (img.src === targetImg.src) {
-        // Correct match
-        box.classList.add('matched');
-        createSparkles(box);
-        createSparkles(document.querySelector('.target-image'));
-
-        showPopup("Great job! You found the matching picture! 🎉", '#4caf50');
-
-        setTimeout(markSuccessAndNext, 1200);
-      } else {
-        // Incorrect match
-        showPopup("Try again. Look for the image that matches the one above.", '#ff9800');
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
       }
-    }
-
-    function markSuccessAndNext() {
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'fifth.php';
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'fifth.php';
+      }, 1500);
     }
 
     function skipActivity() {

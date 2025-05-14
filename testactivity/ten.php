@@ -509,6 +509,15 @@
         // Incorrect coloring
         showPopup(`Try again! This part needs color ${correctNumber}`, '#ff9800');
       }
+      
+      // Proceed to next activity after delay regardless of answer
+      setTimeout(() => {
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        if (selectedColor === correctNumber) {
+          localStorage.setItem('activityScore', score + 1);
+        }
+        window.location.href = 'index.html';
+      }, 2000);
     }
 
     function checkCompletion() {

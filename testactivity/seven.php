@@ -354,16 +354,39 @@
       e.preventDefault();
     });
 
-    // Drop event on flag to check for success
-    flag.addEventListener("drop", function(e) {
+    // Add drop event listener to the flag
+    flag.addEventListener('drop', (e) => {
       e.preventDefault();
-      const data = e.dataTransfer.getData("text");
-      if (data === "mouse" && !isDropped) {
-        isDropped = true;
-        showPopup("Great job! You solved the maze! 🏁✅", "#4caf50");
-        createConfetti();
-        setTimeout(markSuccessAndNext, 2000);
+      const mouse = document.getElementById('mouse');
+      const rect = flag.getBoundingClientRect();
+      const mouseRect = mouse.getBoundingClientRect();
+      
+      // Check if mouse is dropped on the flag
+      if (e.clientX >= rect.left && e.clientX <= rect.right &&
+          e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
       }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'eight.php';
+      }, 1500);
+    });
+
+    // Add drop event listener to the document for drops outside the flag
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'eight.php';
+      }, 1500);
+    });
+
+    // Add event listener for dragover anywhere on the page
+    document.body.addEventListener("dragover", function(e) {
+      e.preventDefault();
     });
 
     function showPopup(message, color = '#4caf50') {

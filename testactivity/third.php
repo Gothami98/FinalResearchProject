@@ -309,12 +309,15 @@
 
     function checkAnswer(color) {
       if (color === 'red') {
-        showPopup("Fantastic! You found the red object! 🔴", '#ff6f61');
-        createConfetti();
-        setTimeout(markSuccessAndNext, 1200);
-      } else {
-        showPopup("Look for the red object. Remember, this is red. 🔴", '#ff9800');
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
       }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'four.php';
+      }, 1500);
     }
 
     function skipActivity() {

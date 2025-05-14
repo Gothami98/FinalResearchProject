@@ -320,7 +320,14 @@
         if (count === 5) {
           showPopup("Fantastic! You counted all five apples! 🍏", "#4caf50");
           createConfetti();
-          setTimeout(markSuccessAndNext, 2000);
+          // Add mark for correct answer
+          let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+          localStorage.setItem('activityScore', score + 1);
+          
+          // Only proceed to next activity after all apples are clicked
+          setTimeout(() => {
+            window.location.href = 'ten.php';
+          }, 2000);
         } else {
           showPopup(`Good job! You clicked ${count} apple${count > 1 ? 's' : ''}. Keep going! 🍎`, "#ff9800");
         }
@@ -352,12 +359,6 @@
     function skipActivity() {
       showPopup("Skipping this activity...", "#ff9800");
       setTimeout(() => window.location.href = 'ten.php', 1500);
-    }
-
-    function markSuccessAndNext() {
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'ten.php';
     }
 
     // Add confetti effect for correct answers

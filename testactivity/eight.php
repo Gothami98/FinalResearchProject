@@ -303,18 +303,29 @@
     showPopup("Let's get started! 😊", "#ff6f61");
 
     // Event listeners for face clicks
-    happy.addEventListener("click", function() {
-      showPopup("Excellent! You recognized the happy face! 😄", "#4caf50");
-      createConfetti();
-      setTimeout(markSuccessAndNext, 2000);
+    happy.addEventListener("click", () => {
+      // Add mark for correct answer without showing feedback
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'nine.php';
+      }, 1500);
     });
 
-    neutral.addEventListener("click", function() {
-      showPopup("Try again. Look for the happy face. ❌", "#ff9800");
+    neutral.addEventListener("click", () => {
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'nine.php';
+      }, 1500);
     });
 
-    sad.addEventListener("click", function() {
-      showPopup("Try again. Look for the happy face. ❌", "#ff9800");
+    sad.addEventListener("click", () => {
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'nine.php';
+      }, 1500);
     });
 
     function showPopup(message, color = '#4caf50') {

@@ -305,17 +305,28 @@
     showPopup("Let's go! 🚗", "#ff6f61");
 
     redCar.addEventListener("click", () => {
-      showPopup("Perfect! You followed the instructions! ✅", "#4caf50");
-      createConfetti();
-      setTimeout(markSuccessAndNext, 2000);
+      // Add mark for correct answer without showing feedback
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'seven.php';
+      }, 1500);
     });
 
     blueBus.addEventListener("click", () => {
-      showPopup("Try again. Click on the red car. ❌", "#ff9800");
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'seven.php';
+      }, 1500);
     });
     
     greenBike.addEventListener("click", () => {
-      showPopup("Try again. Click on the red car. ❌", "#ff9800");
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'seven.php';
+      }, 1500);
     });
 
     function showPopup(message, color = '#4caf50') {
@@ -380,6 +391,21 @@
         window.location.href = 'seven.php'; // Ensure this path is correct
     }, 1000);
 }
+
+    function checkAnswer(selectedAnswer) {
+      const correctAnswer = 'C';
+      
+      // Add mark for correct answer without showing feedback
+      if (selectedAnswer === correctAnswer) {
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
+      }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'seven.php';
+      }, 1500);
+    }
 
   </script>
 </body>

@@ -337,18 +337,28 @@
       e.preventDefault();
       const data = e.dataTransfer.getData("text");
       if (data === "ball") {
-        ball.style.display = "none";
-        showPopup("Well done! You moved the ball into the basket! 🏀✅", "#4caf50");
+        ball.style.display = "none";        
         droppedSuccessfully = true;
-        createConfetti();
-        setTimeout(markSuccessAndNext, 2000);
+        
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
       }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'six.php';
+      }, 1500);
     });
 
     document.body.addEventListener("drop", function (e) {
       e.preventDefault();
       if (!droppedSuccessfully) {
-        showPopup("Try again. Drag the ball into the basket. ❌", "#ff9800");
+        
+        // Proceed to next activity after a delay
+        setTimeout(() => {
+          window.location.href = 'six.php';
+        }, 2000);
       }
     });
 
@@ -419,6 +429,21 @@
         window.location.href = 'six.php'; // Ensure this path is correct
     }, 1000);
 }
+
+    function checkAnswer(selectedAnswer) {
+      const correctAnswer = 'B';
+      
+      // Add mark for correct answer without showing feedback
+      if (selectedAnswer === correctAnswer) {
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
+      }
+      
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'six.php';
+      }, 1500);
+    }
 
   </script>
 </body>
