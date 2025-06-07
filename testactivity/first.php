@@ -270,6 +270,39 @@
       color: #ff9800;
     }
 
+    /* Instruction button */
+    .instruction-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #9c27b0;
+      color: white;
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      font-family: 'Bubblegum Sans', cursive;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+    }
+
+    .instruction-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+      background-color: #7b1fa2;
+    }
+
+    .instruction-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .instruction-button i {
+      margin-right: 8px;
+    }
+
     /* Skip button at body level */
     .skip-fixed {
       position: fixed;
@@ -404,6 +437,13 @@
         font-size: 1.2rem;
       }
       
+      .instruction-button {
+        padding: 10px 15px;
+        font-size: 1rem;
+        top: 10px;
+        left: 10px;
+      }
+      
       .skip-fixed {
         padding: 10px 20px;
         font-size: 1rem;
@@ -414,6 +454,11 @@
   </style>
 </head>
 <body>
+  <!-- Instruction button -->
+  <button class="instruction-button" onclick="playInstructions()">
+    <i class="fas fa-volume-up"></i>Instructions
+  </button>
+
   <!-- Navigation Icons -->
   <div class="nav-icons">
     <div class="nav-icon home" onclick="goHome()">
@@ -463,10 +508,13 @@
     <div class="loading-spinner"></div>
   </div>
 
+  <!-- Audio elements -->
   <audio id="dogSound" src="../Audio/dog.mp3"></audio>
+  <audio id="instructionSound" src="../Audio/first.mp3"></audio>
 
   <script>
     const sound = document.getElementById("dogSound");
+    const instructionSound = document.getElementById("instructionSound");
     const popup = document.getElementById("popupMessage");
     const soundWave = document.getElementById("soundWave");
     const loadingOverlay = document.getElementById("loadingOverlay");
@@ -484,6 +532,13 @@
       }, 2500);
     }
 
+    function playInstructions() {
+      instructionSound.currentTime = 0;
+      instructionSound.play();
+      soundWave.classList.add("active");
+      showPopup("🎧 Listening to instructions...", '#9c27b0');
+    }
+
     function playDogSound() {
       sound.currentTime = 0;
       sound.play();
@@ -491,7 +546,7 @@
       showPopup("Great! You heard the dog barking! 🐶🔊", '#4caf50');
     }
 
-    // Auto-navigate to next page after sound ends
+    // Auto-navigate to next page after dog sound ends
     sound.addEventListener('ended', () => {
       soundWave.classList.remove("active");
       
@@ -504,6 +559,11 @@
           window.location.href = 'second.php';
         }, 1000);
       }, 1500); // Wait a moment after sound ends before loading
+    });
+
+    // Remove sound wave animation when instruction sound ends
+    instructionSound.addEventListener('ended', () => {
+      soundWave.classList.remove("active");
     });
 
     function skipAnimal() {
@@ -546,7 +606,28 @@
 
     window.onload = function() {
       localStorage.setItem('activityScore', '0');
+      
+      // Play instructions automatically when page loads
+      setTimeout(() => {
+        playInstructions();
+      }, 500); // Small delay to ensure page is fully loaded
     };
+
+    // Also play instructions when page is refreshed or reloaded
+    window.addEventListener('beforeunload', function() {
+      // Set a flag to indicate the page is being refreshed
+      sessionStorage.setItem('pageRefreshed', 'true');
+    });
+
+    // Check if page was refreshed and play instructions
+    document.addEventListener('DOMContentLoaded', function() {
+      if (sessionStorage.getItem('pageRefreshed') === 'true') {
+        sessionStorage.removeItem('pageRefreshed');
+        setTimeout(() => {
+          playInstructions();
+        }, 500);
+      }
+    });
 
     function createConfetti() {
       const container = document.querySelector('.container');
