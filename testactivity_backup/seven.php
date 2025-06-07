@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Recognition Activity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple Maze</title>
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
@@ -82,46 +83,73 @@
       animation: fadeIn 1s ease-out;
     }
 
-    .face-container {
-      display: flex;
-      gap: 30px;
-      margin: 30px 0;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .face {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    .maze-container {
+      width: 300px;
+      height: 300px;
+      border: 8px solid #ff6f61;
+      border-radius: 15px;
       position: relative;
+      background: #fff;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       overflow: hidden;
-      border: 5px solid white;
+      margin: 20px auto;
     }
 
-    .face::after {
-      content: "";
+    .maze {
       position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg,
-        rgba(255,255,255,0.25),
-        rgba(255,255,255,0));
-      pointer-events: none;
+      background-color: #f9f9f9;
+      background-image:
+        radial-gradient(#e3e3e3 1px, transparent 1px),
+        radial-gradient(#e3e3e3 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
     }
 
-    .face:hover {
-      transform: translateY(-10px) scale(1.05);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    .drag-area {
+      position: absolute;
+      cursor: grab;
+      width: 36px;
+      height: 36px;
+      background-color: #ff6f61;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 10;
+      transition: all 0.2s;
     }
 
-    .face:active {
-      transform: scale(0.95);
+    .drag-area:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+    }
+
+    .drag-area i {
+      font-size: 20px;
+      color: white;
+    }
+
+    #flag {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: #4caf50;
+      border-radius: 10px;
+      top: 230px;
+      left: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      animation: pulse 2s infinite;
+    }
+
+    #flag i {
+      font-size: 26px;
+      color: white;
     }
 
     .popup {
@@ -251,28 +279,32 @@
       50% { transform: translateY(-20px) rotate(5deg); }
       100% { transform: translateY(0) rotate(0deg); }
     }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
   </style>
 </head>
 <body>
-  <button class="instruction-button" onclick="playInstructions()">
-    <i class="fas fa-volume-up"></i>Instructions
-  </button>
-
-   <!-- Navigation Icons -->
-    <div class="nav-icons">
-      <div class="nav-icon home" onclick="goHome()">
-        <i class="fas fa-home"></i>
-      </div>
-      <div class="nav-icon setting" onclick="openSettings()">
-        <i class="fas fa-cog"></i>
-      </div>
-      <div class="nav-icon back" onclick="goBack()">
-        <i class="fas fa-arrow-left"></i>
-      </div>
+  <!-- Navigation Icons -->
+  <div class="nav-icons">
+    <div class="nav-icon home" onclick="goHome()">
+      <i class="fas fa-home"></i>
     </div>
+    <div class="nav-icon setting" onclick="openSettings()">
+      <i class="fas fa-cog"></i>
+    </div>
+    <div class="nav-icon back" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+  </div>
 
-    <!-- Skip button -->
-    <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
+
+  <!-- Skip button -->
+  <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
 
   <!-- Decorative shapes -->
@@ -284,103 +316,77 @@
   <div class="shape triangle-2"></div>
 
   <div class="game-container">
-    <h2>Emotion Recognition</h2>
-    <p id="instruction"><strong>Instruction:</strong> Click on the happy face.</p>
+    <h2>Simple Maze</h2>
+    <p id="instruction"> Guide the mouse through the maze to the flag.</p>
 
-    <div class="face-container">
-      <img src="../images/happy.png" alt="Happy Face" id="happy" class="face">
-      <img src="../images/natural.png" alt="Neutral Face" id="neutral" class="face">
-      <img src="../images/sad.png" alt="Sad Face" id="sad" class="face">
+    <!-- Maze Container -->
+    <div class="maze-container">
+      <div class="maze">
+        <div id="dragArea" class="drag-area" draggable="true">
+          <i class="fas fa-mouse"></i>
+        </div>
+        <div id="flag">
+          <i class="fas fa-flag"></i>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Let's get started! 😊</div>
+  <div class="popup" id="popupMessage">Guide the mouse to the flag! 🎯</div>
 
-  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
-    // --- New Instructions Script (Audio Version) ---
-    function playInstructions() {
-      const instructionSound = document.getElementById("instructionSound");
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (!instructionSound) { console.error('instructionSound element not found'); return; }
-      instructionSound.currentTime = 0;
-      instructionSound.play();
-      if (soundWave) { // This check will prevent errors
-        soundWave.classList.add("active");
-      }
-      if (typeof showPopup === 'function') {
-        showPopup("🎧 Listening to instructions...\", '#9c27b0');
-      }
-      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
-      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
-    }
-
-    function instructionSoundEndedListener() {
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (soundWave) {
-        soundWave.classList.remove("active");
-      }
-    }
-
-    var originalWindowOnloadEight = window.onload; // Preserve potential existing onload
-    window.onload = function(e) { // Pass event args
-      if (typeof originalWindowOnloadEight === 'function') {
-        originalWindowOnloadEight(e);
-      }
-      console.log('New window.onload for audio instructions (eight.php).');
-      setTimeout(() => {
-        playInstructions();
-      }, 500);
-    };
-
-    window.addEventListener('beforeunload', function() {
-      sessionStorage.setItem('pageRefreshed', 'true');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('New DOMContentLoaded for audio instructions (eight.php).');
-      if (sessionStorage.getItem('pageRefreshed') === 'true') {
-        sessionStorage.removeItem('pageRefreshed');
-        setTimeout(() => {
-          playInstructions();
-        }, 500);
-      }
-    });
-    // --- End of New Instructions Script ---
-
-    const happy = document.getElementById("happy");
-    const neutral = document.getElementById("neutral");
-    const sad = document.getElementById("sad");
+    const dragArea = document.getElementById("dragArea");
+    const flag = document.getElementById("flag");
     const popup = document.getElementById("popupMessage");
+    let isDropped = false;
 
     // Show startup popup
-    showPopup("Let's get started! 😊", "#ff6f61");
+    showPopup("Guide the mouse to the flag! 🎯", "#ff6f61");
 
-    // Event listeners for face clicks
-    happy.addEventListener("click", () => {
-      // Add mark for correct answer without showing feedback
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      
+    // Drag start event for the mouse
+    dragArea.addEventListener("dragstart", function(e) {
+      e.dataTransfer.setData("text", "mouse");
+    });
+
+    // Drag over event to allow dropping
+    flag.addEventListener("dragover", function(e) {
+      e.preventDefault();
+    });
+
+    // Add drop event listener to the flag
+    flag.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const mouse = document.getElementById('mouse');
+      const rect = flag.getBoundingClientRect();
+      const mouseRect = mouse.getBoundingClientRect();
+
+      // Check if mouse is dropped on the flag
+      if (e.clientX >= rect.left && e.clientX <= rect.right &&
+          e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
+      }
+
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
-        window.location.href = 'nine.php';
+        window.location.href = 'eight.php';
       }, 1500);
     });
 
-    neutral.addEventListener("click", () => {
+    // Add drop event listener to the document for drops outside the flag
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
-        window.location.href = 'nine.php';
+        window.location.href = 'eight.php';
       }, 1500);
     });
 
-    sad.addEventListener("click", () => {
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
+    // Add event listener for dragover anywhere on the page
+    document.body.addEventListener("dragover", function(e) {
+      e.preventDefault();
     });
 
     function showPopup(message, color = '#4caf50') {
@@ -394,7 +400,7 @@
     }
 
     function goHome() {
-      window.location.href = 'index.php';
+      window.location.href = 'index.html';
     }
 
     function openSettings() {
@@ -408,7 +414,7 @@
     function markSuccessAndNext() {
       let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
       localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'nine.php';
+      window.location.href = 'eight.php';
     }
 
     // Add confetti effect for correct answers
@@ -442,7 +448,7 @@
 
     // Add a slight delay before loading the next activity
     setTimeout(() => {
-        window.location.href = 'nine.php'; // Ensure this path is correct
+        window.location.href = 'eight.php'; // Ensure this path is correct
     }, 1000);
 }
 

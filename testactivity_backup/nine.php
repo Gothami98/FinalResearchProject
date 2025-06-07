@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Recognition Activity</title>
+  <title>Count the Apples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 
   <style>
     body {
@@ -82,27 +83,30 @@
       animation: fadeIn 1s ease-out;
     }
 
-    .face-container {
+    .apples {
       display: flex;
+      justify-content: center;
       gap: 30px;
       margin: 30px 0;
       flex-wrap: wrap;
-      justify-content: center;
     }
 
-    .face {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+    .apple {
+      width: 100px;
+      height: 100px;
+      background-image: url('../images/apple1.jpg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-radius: 20px;
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       position: relative;
       overflow: hidden;
-      border: 5px solid white;
     }
 
-    .face::after {
+    .apple::after {
       content: "";
       position: absolute;
       top: 0;
@@ -115,13 +119,20 @@
       pointer-events: none;
     }
 
-    .face:hover {
+    .apple:hover {
       transform: translateY(-10px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     }
 
-    .face:active {
+    .apple:active {
       transform: scale(0.95);
+    }
+
+    .apple.clicked {
+      transform: scale(0.9);
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.5);
     }
 
     .popup {
@@ -130,7 +141,7 @@
       left: 50%;
       transform: translateX(-50%);
       background-color: #ffffff;
-      color: #ff6f61;
+      color: #4caf50;
       padding: 15px 30px;
       font-size: 1.4rem;
       font-weight: bold;
@@ -254,11 +265,7 @@
   </style>
 </head>
 <body>
-  <button class="instruction-button" onclick="playInstructions()">
-    <i class="fas fa-volume-up"></i>Instructions
-  </button>
-
-   <!-- Navigation Icons -->
+  <!-- Navigation Icons -->
     <div class="nav-icons">
       <div class="nav-icon home" onclick="goHome()">
         <i class="fas fa-home"></i>
@@ -274,7 +281,6 @@
     <!-- Skip button -->
     <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
-
   <!-- Decorative shapes -->
   <div class="shape circle-1"></div>
   <div class="shape square-1"></div>
@@ -284,104 +290,49 @@
   <div class="shape triangle-2"></div>
 
   <div class="game-container">
-    <h2>Emotion Recognition</h2>
-    <p id="instruction"><strong>Instruction:</strong> Click on the happy face.</p>
+    <h2>Count from 1 to 5</h2>
+    <p id="instruction">Count the apples by clicking on each one.</p>
 
-    <div class="face-container">
-      <img src="../images/happy.png" alt="Happy Face" id="happy" class="face">
-      <img src="../images/natural.png" alt="Neutral Face" id="neutral" class="face">
-      <img src="../images/sad.png" alt="Sad Face" id="sad" class="face">
+    <div class="apples">
+      <div class="apple" onclick="countApple(this)"></div>
+      <div class="apple" onclick="countApple(this)"></div>
+      <div class="apple" onclick="countApple(this)"></div>
+      <div class="apple" onclick="countApple(this)"></div>
+      <div class="apple" onclick="countApple(this)"></div>
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Let's get started! 😊</div>
+  <div class="popup" id="popupMessage">Let's begin! 🍎</div>
 
-  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
-    // --- New Instructions Script (Audio Version) ---
-    function playInstructions() {
-      const instructionSound = document.getElementById("instructionSound");
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (!instructionSound) { console.error('instructionSound element not found'); return; }
-      instructionSound.currentTime = 0;
-      instructionSound.play();
-      if (soundWave) { // This check will prevent errors
-        soundWave.classList.add("active");
-      }
-      if (typeof showPopup === 'function') {
-        showPopup("🎧 Listening to instructions...\", '#9c27b0');
-      }
-      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
-      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
-    }
-
-    function instructionSoundEndedListener() {
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (soundWave) {
-        soundWave.classList.remove("active");
-      }
-    }
-
-    var originalWindowOnloadEight = window.onload; // Preserve potential existing onload
-    window.onload = function(e) { // Pass event args
-      if (typeof originalWindowOnloadEight === 'function') {
-        originalWindowOnloadEight(e);
-      }
-      console.log('New window.onload for audio instructions (eight.php).');
-      setTimeout(() => {
-        playInstructions();
-      }, 500);
-    };
-
-    window.addEventListener('beforeunload', function() {
-      sessionStorage.setItem('pageRefreshed', 'true');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('New DOMContentLoaded for audio instructions (eight.php).');
-      if (sessionStorage.getItem('pageRefreshed') === 'true') {
-        sessionStorage.removeItem('pageRefreshed');
-        setTimeout(() => {
-          playInstructions();
-        }, 500);
-      }
-    });
-    // --- End of New Instructions Script ---
-
-    const happy = document.getElementById("happy");
-    const neutral = document.getElementById("neutral");
-    const sad = document.getElementById("sad");
+    let count = 0;
     const popup = document.getElementById("popupMessage");
 
     // Show startup popup
-    showPopup("Let's get started! 😊", "#ff6f61");
+    showPopup("Let's begin! 🍎", "#ff6f61");
 
-    // Event listeners for face clicks
-    happy.addEventListener("click", () => {
-      // Add mark for correct answer without showing feedback
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
+    function countApple(element) {
+      if (!element.classList.contains('clicked')) {
+        element.classList.add('clicked');
+        count++;
 
-    neutral.addEventListener("click", () => {
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
+        if (count === 5) {
+          showPopup("Fantastic! You counted all five apples! 🍏", "#4caf50");
+          createConfetti();
+          // Add mark for correct answer
+          let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+          localStorage.setItem('activityScore', score + 1);
 
-    sad.addEventListener("click", () => {
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
+          // Only proceed to next activity after all apples are clicked
+          setTimeout(() => {
+            window.location.href = 'ten.php';
+          }, 2000);
+        } else {
+          showPopup(`Good job! You clicked ${count} apple${count > 1 ? 's' : ''}. Keep going! 🍎`, "#ff9800");
+        }
+      }
+    }
 
     function showPopup(message, color = '#4caf50') {
       popup.textContent = message;
@@ -394,7 +345,7 @@
     }
 
     function goHome() {
-      window.location.href = 'index.php';
+      window.location.href = 'index.html';
     }
 
     function openSettings() {
@@ -405,10 +356,9 @@
       window.history.back();
     }
 
-    function markSuccessAndNext() {
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'nine.php';
+    function skipActivity() {
+      showPopup("Skipping this activity...", "#ff9800");
+      setTimeout(() => window.location.href = 'ten.php', 1500);
     }
 
     // Add confetti effect for correct answers
@@ -437,15 +387,6 @@
         }, 5000);
       }
     }
-    function skipActivity() {
-    showPopup("Skipped this one! ⏭", '#ff9800');
-
-    // Add a slight delay before loading the next activity
-    setTimeout(() => {
-        window.location.href = 'nine.php'; // Ensure this path is correct
-    }, 1000);
-}
-
   </script>
 </body>
 </html>

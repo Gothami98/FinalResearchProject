@@ -295,10 +295,6 @@
   </style>
 </head>
 <body>
-  <button class="instruction-button" onclick="playInstructions()">
-    <i class="fas fa-volume-up"></i>Instructions
-  </button>
-
     <!-- Navigation Icons -->
     <div class="nav-icons">
       <div class="nav-icon home" onclick="goHome()">
@@ -345,55 +341,7 @@
   <!-- Popup message -->
   <div class="popup" id="popupMessage">Great job! You found the matching picture! 🎉</div>
 
-  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
-    // --- New Instructions Script (Audio Version) ---
-    function playInstructions() {
-      const instructionSound = document.getElementById("instructionSound");
-      const soundWave = null; // soundWave element does not exist in four.php
-      if (!instructionSound) { console.error('instructionSound element not found'); return; }
-      instructionSound.currentTime = 0;
-      instructionSound.play();
-      if (soundWave) { // This check will prevent errors
-        soundWave.classList.add("active");
-      }
-      if (typeof showPopup === 'function') {
-        showPopup("🎧 Listening to instructions...\", '#9c27b0');
-      }
-      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
-      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
-    }
-
-    function instructionSoundEndedListener() {
-      const soundWave = null; // soundWave element does not exist in four.php
-      if (soundWave) {
-        soundWave.classList.remove("active");
-      }
-    }
-
-    window.onload = function() {
-      // If there was an existing window.onload, this overwrites it.
-      console.log('New window.onload for audio instructions.');
-      setTimeout(() => {
-        playInstructions();
-      }, 500);
-    };
-
-    window.addEventListener('beforeunload', function() {
-      sessionStorage.setItem('pageRefreshed', 'true');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('New DOMContentLoaded for audio instructions.');
-      if (sessionStorage.getItem('pageRefreshed') === 'true') {
-        sessionStorage.removeItem('pageRefreshed');
-        setTimeout(() => {
-          playInstructions();
-        }, 500);
-      }
-    });
-    // --- End of New Instructions Script ---
-
     const popup = document.getElementById("popupMessage");
     const targetImg = document.getElementById("targetImg");
 
@@ -441,7 +389,7 @@
         let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
         localStorage.setItem('activityScore', score + 1);
       }
-      
+
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
         window.location.href = 'fifth.php';

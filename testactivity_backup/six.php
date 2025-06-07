@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Recognition Activity</title>
+  <title>Follow the Instructions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 
   <style>
     body {
@@ -82,27 +83,28 @@
       animation: fadeIn 1s ease-out;
     }
 
-    .face-container {
+    .scene {
       display: flex;
       gap: 30px;
       margin: 30px 0;
+      align-items: center;
       flex-wrap: wrap;
       justify-content: center;
     }
 
-    .face {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+    .scene img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-radius: 20px;
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       position: relative;
       overflow: hidden;
-      border: 5px solid white;
     }
 
-    .face::after {
+    .scene img::after {
       content: "";
       position: absolute;
       top: 0;
@@ -115,12 +117,12 @@
       pointer-events: none;
     }
 
-    .face:hover {
+    .scene img:hover {
       transform: translateY(-10px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     }
 
-    .face:active {
+    .scene img:active {
       transform: scale(0.95);
     }
 
@@ -130,7 +132,7 @@
       left: 50%;
       transform: translateX(-50%);
       background-color: #ffffff;
-      color: #ff6f61;
+      color: #4caf50;
       padding: 15px 30px;
       font-size: 1.4rem;
       font-weight: bold;
@@ -254,25 +256,21 @@
   </style>
 </head>
 <body>
-  <button class="instruction-button" onclick="playInstructions()">
-    <i class="fas fa-volume-up"></i>Instructions
-  </button>
-
-   <!-- Navigation Icons -->
-    <div class="nav-icons">
-      <div class="nav-icon home" onclick="goHome()">
-        <i class="fas fa-home"></i>
-      </div>
-      <div class="nav-icon setting" onclick="openSettings()">
-        <i class="fas fa-cog"></i>
-      </div>
-      <div class="nav-icon back" onclick="goBack()">
-        <i class="fas fa-arrow-left"></i>
-      </div>
+  <!-- Navigation Icons -->
+  <div class="nav-icons">
+    <div class="nav-icon home" onclick="goHome()">
+      <i class="fas fa-home"></i>
     </div>
+    <div class="nav-icon setting" onclick="openSettings()">
+      <i class="fas fa-cog"></i>
+    </div>
+    <div class="nav-icon back" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+  </div>
 
-    <!-- Skip button -->
-    <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
+  <!-- Skip button -->
+  <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
 
   <!-- Decorative shapes -->
@@ -284,102 +282,50 @@
   <div class="shape triangle-2"></div>
 
   <div class="game-container">
-    <h2>Emotion Recognition</h2>
-    <p id="instruction"><strong>Instruction:</strong> Click on the happy face.</p>
+    <h2>Follow the Instructions</h2>
+    <p id="instruction">Click on the red car.</p>
 
-    <div class="face-container">
-      <img src="../images/happy.png" alt="Happy Face" id="happy" class="face">
-      <img src="../images/natural.png" alt="Neutral Face" id="neutral" class="face">
-      <img src="../images/sad.png" alt="Sad Face" id="sad" class="face">
+    <div class="scene">
+      <img src="../images/redcar.jpg" id="red-car" alt="Red Car">
+      <img src="../images/bluebus.jpg" id="blue-bus" alt="Blue Bus">
+      <img src="../images/greenbike.jpg" id="green-bike" alt="Green Bike">
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Let's get started! 😊</div>
+  <div class="popup" id="popupMessage">Let's go! 🚗</div>
 
-  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
-    // --- New Instructions Script (Audio Version) ---
-    function playInstructions() {
-      const instructionSound = document.getElementById("instructionSound");
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (!instructionSound) { console.error('instructionSound element not found'); return; }
-      instructionSound.currentTime = 0;
-      instructionSound.play();
-      if (soundWave) { // This check will prevent errors
-        soundWave.classList.add("active");
-      }
-      if (typeof showPopup === 'function') {
-        showPopup("🎧 Listening to instructions...\", '#9c27b0');
-      }
-      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
-      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
-    }
-
-    function instructionSoundEndedListener() {
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (soundWave) {
-        soundWave.classList.remove("active");
-      }
-    }
-
-    var originalWindowOnloadEight = window.onload; // Preserve potential existing onload
-    window.onload = function(e) { // Pass event args
-      if (typeof originalWindowOnloadEight === 'function') {
-        originalWindowOnloadEight(e);
-      }
-      console.log('New window.onload for audio instructions (eight.php).');
-      setTimeout(() => {
-        playInstructions();
-      }, 500);
-    };
-
-    window.addEventListener('beforeunload', function() {
-      sessionStorage.setItem('pageRefreshed', 'true');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('New DOMContentLoaded for audio instructions (eight.php).');
-      if (sessionStorage.getItem('pageRefreshed') === 'true') {
-        sessionStorage.removeItem('pageRefreshed');
-        setTimeout(() => {
-          playInstructions();
-        }, 500);
-      }
-    });
-    // --- End of New Instructions Script ---
-
-    const happy = document.getElementById("happy");
-    const neutral = document.getElementById("neutral");
-    const sad = document.getElementById("sad");
+    const redCar = document.getElementById("red-car");
+    const blueBus = document.getElementById("blue-bus");
+    const greenBike = document.getElementById("green-bike");
     const popup = document.getElementById("popupMessage");
 
     // Show startup popup
-    showPopup("Let's get started! 😊", "#ff6f61");
+    showPopup("Let's go! 🚗", "#ff6f61");
 
-    // Event listeners for face clicks
-    happy.addEventListener("click", () => {
+    redCar.addEventListener("click", () => {
       // Add mark for correct answer without showing feedback
       let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
       localStorage.setItem('activityScore', score + 1);
-      
+
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
-        window.location.href = 'nine.php';
+        window.location.href = 'seven.php';
       }, 1500);
     });
 
-    neutral.addEventListener("click", () => {
+    blueBus.addEventListener("click", () => {
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
-        window.location.href = 'nine.php';
+        window.location.href = 'seven.php';
       }, 1500);
     });
 
-    sad.addEventListener("click", () => {
+    greenBike.addEventListener("click", () => {
       // Proceed to next activity after a delay, without showing feedback
       setTimeout(() => {
-        window.location.href = 'nine.php';
+        window.location.href = 'seven.php';
       }, 1500);
     });
 
@@ -394,7 +340,7 @@
     }
 
     function goHome() {
-      window.location.href = 'index.php';
+      window.location.href = 'index.html';
     }
 
     function openSettings() {
@@ -408,7 +354,7 @@
     function markSuccessAndNext() {
       let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
       localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'nine.php';
+      window.location.href = 'seven.php';
     }
 
     // Add confetti effect for correct answers
@@ -442,9 +388,24 @@
 
     // Add a slight delay before loading the next activity
     setTimeout(() => {
-        window.location.href = 'nine.php'; // Ensure this path is correct
+        window.location.href = 'seven.php'; // Ensure this path is correct
     }, 1000);
 }
+
+    function checkAnswer(selectedAnswer) {
+      const correctAnswer = 'C';
+
+      // Add mark for correct answer without showing feedback
+      if (selectedAnswer === correctAnswer) {
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
+      }
+
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'seven.php';
+      }, 1500);
+    }
 
   </script>
 </body>

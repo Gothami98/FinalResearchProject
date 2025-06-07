@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emotion Recognition Activity</title>
+  <title>Click the Color Red</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css" />
 
   <style>
     body {
@@ -54,7 +55,7 @@
       border-radius: 40px;
     }
 
-    h2 {
+    h1 {
       font-size: 2.8rem;
       color: #ff6f61;
       margin-bottom: 30px;
@@ -63,7 +64,7 @@
       position: relative;
     }
 
-    h2::after {
+    h1::after {
       content: "";
       position: absolute;
       bottom: -10px;
@@ -75,34 +76,26 @@
       border-radius: 2px;
     }
 
-    #instruction {
-      font-size: 1.5rem;
-      color: #444;
-      margin-bottom: 30px;
-      animation: fadeIn 1s ease-out;
-    }
-
-    .face-container {
+    .color-container {
       display: flex;
-      gap: 30px;
-      margin: 30px 0;
-      flex-wrap: wrap;
+      gap: 25px;
       justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
     }
 
-    .face {
+    .color-box {
       width: 150px;
       height: 150px;
-      border-radius: 50%;
+      border-radius: 20px;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       position: relative;
       overflow: hidden;
-      border: 5px solid white;
     }
 
-    .face::after {
+    .color-box::after {
       content: "";
       position: absolute;
       top: 0;
@@ -115,12 +108,12 @@
       pointer-events: none;
     }
 
-    .face:hover {
+    .color-box:hover {
       transform: translateY(-10px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     }
 
-    .face:active {
+    .color-box:active {
       transform: scale(0.95);
     }
 
@@ -130,7 +123,7 @@
       left: 50%;
       transform: translateX(-50%);
       background-color: #ffffff;
-      color: #ff6f61;
+      color: #4caf50;
       padding: 15px 30px;
       font-size: 1.4rem;
       font-weight: bold;
@@ -147,7 +140,29 @@
       transform: translate(-50%, 0);
     }
 
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
 
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    .red {
+      background: linear-gradient(315deg, #ff416c, #ff4b2b);
+    }
+
+    .blue {
+      background: linear-gradient(315deg, #0575e6, #021b79);
+    }
+
+    .green {
+      background: linear-gradient(315deg, #43a047, #66bb6a);
+    }
 
     /* Confetti effect for correct answers */
     .confetti {
@@ -234,18 +249,6 @@
       animation-delay: 5s;
     }
 
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(-20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes bounceIn {
-      0% { opacity: 0; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.05); }
-      70% { transform: scale(0.95); }
-      100% { transform: scale(1); }
-    }
-
     @keyframes float {
       0% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-20px) rotate(5deg); }
@@ -254,134 +257,45 @@
   </style>
 </head>
 <body>
-  <button class="instruction-button" onclick="playInstructions()">
-    <i class="fas fa-volume-up"></i>Instructions
-  </button>
-
-   <!-- Navigation Icons -->
-    <div class="nav-icons">
-      <div class="nav-icon home" onclick="goHome()">
-        <i class="fas fa-home"></i>
-      </div>
-      <div class="nav-icon setting" onclick="openSettings()">
-        <i class="fas fa-cog"></i>
-      </div>
-      <div class="nav-icon back" onclick="goBack()">
-        <i class="fas fa-arrow-left"></i>
-      </div>
+  <!-- Navigation Icons -->
+  <div class="nav-icons">
+    <div class="nav-icon home" onclick="goHome()">
+      <i class="fas fa-home"></i>
     </div>
+    <div class="nav-icon setting" onclick="openSettings()">
+      <i class="fas fa-cog"></i>
+    </div>
+    <div class="nav-icon back" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+  </div>
 
-    <!-- Skip button -->
-    <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
-
+  <!-- Skip button -->
+  <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
   <!-- Decorative shapes -->
-  <div class="shape circle-1"></div>
-  <div class="shape square-1"></div>
-  <div class="shape triangle-1"></div>
-  <div class="shape circle-2"></div>
-  <div class="shape square-2"></div>
-  <div class="shape triangle-2"></div>
+  <div class="shape circle-1 decoration"></div>
+  <div class="shape square-1 decoration"></div>
+  <div class="shape triangle-1 decoration"></div>
+  <div class="shape circle-2 decoration"></div>
+  <div class="shape square-2 decoration"></div>
+  <div class="shape triangle-2 decoration"></div>
 
   <div class="game-container">
-    <h2>Emotion Recognition</h2>
-    <p id="instruction"><strong>Instruction:</strong> Click on the happy face.</p>
+    <h1>Click on the red object!</h1>
 
-    <div class="face-container">
-      <img src="../images/happy.png" alt="Happy Face" id="happy" class="face">
-      <img src="../images/natural.png" alt="Neutral Face" id="neutral" class="face">
-      <img src="../images/sad.png" alt="Sad Face" id="sad" class="face">
+    <div class="color-container">
+      <div class="color-box red" onclick="checkAnswer('red')"></div>
+      <div class="color-box blue" onclick="checkAnswer('blue')"></div>
+      <div class="color-box green" onclick="checkAnswer('green')"></div>
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Let's get started! 😊</div>
+  <div class="popup" id="popupMessage">Great! You found the red object! 🔴</div>
 
-  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
-    // --- New Instructions Script (Audio Version) ---
-    function playInstructions() {
-      const instructionSound = document.getElementById("instructionSound");
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (!instructionSound) { console.error('instructionSound element not found'); return; }
-      instructionSound.currentTime = 0;
-      instructionSound.play();
-      if (soundWave) { // This check will prevent errors
-        soundWave.classList.add("active");
-      }
-      if (typeof showPopup === 'function') {
-        showPopup("🎧 Listening to instructions...\", '#9c27b0');
-      }
-      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
-      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
-    }
-
-    function instructionSoundEndedListener() {
-      const soundWave = null; // soundWave element does not exist in eight.php
-      if (soundWave) {
-        soundWave.classList.remove("active");
-      }
-    }
-
-    var originalWindowOnloadEight = window.onload; // Preserve potential existing onload
-    window.onload = function(e) { // Pass event args
-      if (typeof originalWindowOnloadEight === 'function') {
-        originalWindowOnloadEight(e);
-      }
-      console.log('New window.onload for audio instructions (eight.php).');
-      setTimeout(() => {
-        playInstructions();
-      }, 500);
-    };
-
-    window.addEventListener('beforeunload', function() {
-      sessionStorage.setItem('pageRefreshed', 'true');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('New DOMContentLoaded for audio instructions (eight.php).');
-      if (sessionStorage.getItem('pageRefreshed') === 'true') {
-        sessionStorage.removeItem('pageRefreshed');
-        setTimeout(() => {
-          playInstructions();
-        }, 500);
-      }
-    });
-    // --- End of New Instructions Script ---
-
-    const happy = document.getElementById("happy");
-    const neutral = document.getElementById("neutral");
-    const sad = document.getElementById("sad");
     const popup = document.getElementById("popupMessage");
-
-    // Show startup popup
-    showPopup("Let's get started! 😊", "#ff6f61");
-
-    // Event listeners for face clicks
-    happy.addEventListener("click", () => {
-      // Add mark for correct answer without showing feedback
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
-
-    neutral.addEventListener("click", () => {
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
-
-    sad.addEventListener("click", () => {
-      // Proceed to next activity after a delay, without showing feedback
-      setTimeout(() => {
-        window.location.href = 'nine.php';
-      }, 1500);
-    });
 
     function showPopup(message, color = '#4caf50') {
       popup.textContent = message;
@@ -393,8 +307,35 @@
       }, 2500);
     }
 
+    function checkAnswer(color) {
+      if (color === 'red') {
+        // Add mark for correct answer without showing feedback
+        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+        localStorage.setItem('activityScore', score + 1);
+      }
+
+      // Proceed to next activity after a delay, without showing feedback
+      setTimeout(() => {
+        window.location.href = 'four.php';
+      }, 1500);
+    }
+
+    function skipActivity() {
+      showPopup("You skipped this one! ⏭️", '#ff9800');
+      setTimeout(() => {
+        window.location.href = 'four.php';
+      }, 1500);
+    }
+
+    function markSuccessAndNext() {
+      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+      localStorage.setItem('activityScore', score + 1);
+      window.location.href = 'four.php';
+    }
+
+    // Navigation functions
     function goHome() {
-      window.location.href = 'index.php';
+      window.location.href = 'index.html';
     }
 
     function openSettings() {
@@ -403,12 +344,6 @@
 
     function goBack() {
       window.history.back();
-    }
-
-    function markSuccessAndNext() {
-      let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-      localStorage.setItem('activityScore', score + 1);
-      window.location.href = 'nine.php';
     }
 
     // Add confetti effect for correct answers
@@ -437,15 +372,6 @@
         }, 5000);
       }
     }
-    function skipActivity() {
-    showPopup("Skipped this one! ⏭", '#ff9800');
-
-    // Add a slight delay before loading the next activity
-    setTimeout(() => {
-        window.location.href = 'nine.php'; // Ensure this path is correct
-    }, 1000);
-}
-
   </script>
 </body>
 </html>

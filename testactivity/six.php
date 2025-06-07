@@ -256,6 +256,10 @@
   </style>
 </head>
 <body>
+  <button class="instruction-button" onclick="playInstructions()">
+    <i class="fas fa-volume-up"></i>Instructions
+  </button>
+
   <!-- Navigation Icons -->
   <div class="nav-icons">
     <div class="nav-icon home" onclick="goHome()">
@@ -295,7 +299,58 @@
   <!-- Popup message -->
   <div class="popup" id="popupMessage">Let's go! 🚗</div>
 
+  <audio id="instructionSound" src="../Audio/Instruction-audio.mp3"></audio>
   <script>
+    // --- New Instructions Script (Audio Version) ---
+    function playInstructions() {
+      const instructionSound = document.getElementById("instructionSound");
+      const soundWave = null; // soundWave element does not exist in six.php
+      if (!instructionSound) { console.error('instructionSound element not found'); return; }
+      instructionSound.currentTime = 0;
+      instructionSound.play();
+      if (soundWave) { // This check will prevent errors
+        soundWave.classList.add("active");
+      }
+      if (typeof showPopup === 'function') {
+        showPopup("🎧 Listening to instructions...\", '#9c27b0');
+      }
+      instructionSound.removeEventListener('ended', instructionSoundEndedListener);
+      instructionSound.addEventListener('ended', instructionSoundEndedListener, { once: true });
+    }
+
+    function instructionSoundEndedListener() {
+      const soundWave = null; // soundWave element does not exist in six.php
+      if (soundWave) {
+        soundWave.classList.remove("active");
+      }
+    }
+
+    var originalWindowOnloadSix = window.onload; // Preserve potential existing onload
+    window.onload = function(e) { // Pass event args
+      if (typeof originalWindowOnloadSix === 'function') {
+        originalWindowOnloadSix(e);
+      }
+      console.log('New window.onload for audio instructions (six.php).');
+      setTimeout(() => {
+        playInstructions();
+      }, 500);
+    };
+
+    window.addEventListener('beforeunload', function() {
+      sessionStorage.setItem('pageRefreshed', 'true');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('New DOMContentLoaded for audio instructions (six.php).');
+      if (sessionStorage.getItem('pageRefreshed') === 'true') {
+        sessionStorage.removeItem('pageRefreshed');
+        setTimeout(() => {
+          playInstructions();
+        }, 500);
+      }
+    });
+    // --- End of New Instructions Script ---
+
     const redCar = document.getElementById("red-car");
     const blueBus = document.getElementById("blue-bus");
     const greenBike = document.getElementById("green-bike");
