@@ -14,7 +14,9 @@
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css" />
+
+    <link rel="stylesheet" href="styles.css" />
+
 
   <style>
     body {
@@ -96,7 +98,7 @@
     .drawing-area {
       width: 100%;
       height: 100%;
-      background-color: #e5daed; /* Bird background */
+      background-color: #e8f5e8;
       position: relative;
       display: flex;
       align-items: center;
@@ -106,14 +108,14 @@
     .color-palette {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 15px;
       margin-top: 20px;
       flex-wrap: wrap;
     }
 
     .color-option {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -121,11 +123,12 @@
       align-items: center;
       justify-content: center;
       font-family: 'Fredoka One', cursive;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       color: white;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       position: relative;
+      border: 3px solid transparent;
     }
 
     .color-option:hover {
@@ -135,37 +138,27 @@
 
     .color-option.selected {
       transform: scale(1.1);
-      box-shadow: 0 0 0 3px white, 0 8px 15px rgba(0,0,0,0.3);
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 3px #6b5ce7, 0 8px 15px rgba(0,0,0,0.3);
     }
 
-    .color-label {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background-color: white;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: bold;
-      color: black;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .bird-part {
+    .apple-part {
       position: absolute;
       background-color: transparent;
       stroke: black;
-      stroke-width: 2;
+      stroke-width: 3;
       fill: transparent;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    .bird-part[data-filled="true"] {
-      stroke-width: 1;
+    .apple-part:hover {
+      stroke-width: 4;
+      filter: brightness(1.1);
+    }
+
+    .apple-part[data-filled="true"] {
+      stroke-width: 2;
     }
 
     .popup {
@@ -191,71 +184,20 @@
       transform: translate(-50%, 0);
     }
 
-
-
-
- 
+    
+   
     /* Sparkle effect */
     .sparkle {
       position: absolute;
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background-color: white;
-      box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+      background-color: #ffeb3b;
+      box-shadow: 0 0 15px 3px rgba(255, 235, 59, 0.8);
       pointer-events: none;
       opacity: 0;
       z-index: 100;
-      animation: sparkle 0.8s ease-in-out forwards;
-    }
-
-    /* Bird SVG parts */
-    #bird-body {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #left-eye, #right-eye {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #left-pupil, #right-pupil {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #beak {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #left-wing, #right-wing {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #left-leg, #right-leg {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #left-foot, #right-foot {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
-    }
-    
-    #shadow {
-      fill: transparent;
-      stroke: black;
-      stroke-width: 3;
+      animation: sparkle 1s ease-in-out forwards;
     }
 
     /* Decorative elements */
@@ -267,31 +209,31 @@
       animation: float 6s infinite ease-in-out;
     }
 
-    .dog-icon {
+    .apple-icon {
       font-size: 2rem;
-      color: #ff6f61;
+      color: #ff6b6b;
       top: 10%;
       left: 10%;
       animation-delay: 0s;
     }
 
-    .butterfly-icon {
+    .leaf-icon {
       font-size: 2.5rem;
-      color: #0575e6;
+      color: #4caf50;
       top: 20%;
       right: 15%;
       animation-delay: 1s;
     }
 
-    .flower-icon {
+    .fruit-icon {
       font-size: 2rem;
-      color: #43a047;
+      color: #ffa726;
       bottom: 15%;
       left: 20%;
       animation-delay: 2s;
     }
 
-    .dog-icon-2 {
+    .apple-icon-2 {
       font-size: 1.8rem;
       color: #ffeb3b;
       bottom: 25%;
@@ -299,15 +241,15 @@
       animation-delay: 3s;
     }
 
-    .butterfly-icon-2 {
+    .leaf-icon-2 {
       font-size: 2.2rem;
-      color: #9c27b0;
+      color: #8bc34a;
       top: 70%;
       left: 25%;
       animation-delay: 4s;
     }
 
-    .flower-icon-2 {
+    .fruit-icon-2 {
       font-size: 1.5rem;
       color: #ff9800;
       bottom: 10%;
@@ -317,7 +259,7 @@
 
     @keyframes sparkle {
       0% { transform: scale(0); opacity: 0; }
-      50% { transform: scale(1.5); opacity: 1; }
+      50% { transform: scale(2); opacity: 1; }
       100% { transform: scale(0); opacity: 0; }
     }
 
@@ -338,9 +280,80 @@
       50% { transform: translateY(-20px) rotate(5deg); }
       100% { transform: translateY(0) rotate(0deg); }
     }
+
+
+
+    
+
+    .instruction-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: #9c27b0;
+  color: white;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  font-family: 'Bubblegum Sans', cursive;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.instruction-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  background-color: #7b1fa2;
+}
+
+.instruction-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.instruction-button i {
+  margin-right: 8px;
+}
+.sound-wave {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  margin-bottom: 10px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.sound-wave.active {
+  opacity: 1;
+}
+
+.wave-bar {
+  width: 6px;
+  background-color: #4caf50;
+  border-radius: 3px;
+  animation: sound-wave 1s infinite ease-in-out alternate;
+}
+
+@keyframes sound-wave {
+  0% { transform: scaleY(0.5); }
+  100% { transform: scaleY(1); }
+}
+
+
   </style>
 </head>
 <body>
+
+
+
+<button class="instruction-button" onclick="playInstructions()">
+  <i class="fas fa-volume-up"></i>Instructions
+</button>
+
+<audio id="instructionSound" src="../Audio/10.mp3"></audio>
   <!-- Navigation Icons -->
   <div class="nav-icons">
     <div class="nav-icon home" onclick="goHome()">
@@ -355,79 +368,58 @@
   </div>
 
   <!-- Skip button -->
-  <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
+    <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
   <!-- Decorative elements -->
-  <i class="fas fa-dog dog-icon decoration"></i>
-  <i class="fas fa-butterfly butterfly-icon decoration"></i>
-  <i class="fas fa-spa flower-icon decoration"></i>
-  <i class="fas fa-dog dog-icon-2 decoration"></i>
-  <i class="fas fa-butterfly butterfly-icon-2 decoration"></i>
-  <i class="fas fa-spa flower-icon-2 decoration"></i>
+  <i class="fas fa-apple-alt apple-icon decoration"></i>
+  <i class="fas fa-leaf leaf-icon decoration"></i>
+  <i class="fas fa-apple-alt fruit-icon decoration"></i>
+  <i class="fas fa-apple-alt apple-icon-2 decoration"></i>
+  <i class="fas fa-leaf leaf-icon-2 decoration"></i>
+  <i class="fas fa-apple-alt fruit-icon-2 decoration"></i>
 
   <div class="game-container">
-    <h1>COLOR THE BIRD</h1>
+    <h1>COLOR THE APPLE</h1>
 
     <div class="drawing-container">
       <div class="drawing-area">
-        <!-- Bird SVG -->
+        <!-- Apple SVG -->
         <svg width="100%" height="100%" viewBox="0 0 300 300">
-          <!-- Bird Body - Purple (1) -->
-          <ellipse id="bird-body" class="bird-part" data-number="1" cx="150" cy="150" rx="70" ry="70" />
+          <!-- Apple Body - Red -->
+          <path id="apple-body" class="apple-part" data-color="red" 
+                d="M150,90 C180,90 200,110 200,140 C200,180 190,210 170,230 C160,240 150,245 150,245 C150,245 140,240 130,230 C110,210 100,180 100,140 C100,110 120,90 150,90 Z" />
           
-          <!-- Eyes - White (4) -->
-          <circle id="left-eye" class="bird-part" data-number="4" cx="120" cy="120" r="20" />
-          <circle id="right-eye" class="bird-part" data-number="4" cx="180" cy="120" r="20" />
+          <!-- Apple Indent (top dimple) - Red -->
+          <path id="apple-indent" class="apple-part" data-color="red" 
+                d="M135,95 C140,85 145,88 150,92 C155,88 160,85 165,95 C160,90 155,90 150,95 C145,90 140,90 135,95 Z" />
           
-          <!-- Pupils - Black (6) -->
-          <circle id="left-pupil" class="bird-part" data-number="6" cx="120" cy="120" r="10" />
-          <circle id="right-pupil" class="bird-part" data-number="6" cx="180" cy="120" r="10" />
+          <!-- Left Leaf - Green (pre-colored) -->
+          <path id="left-leaf" class="apple-part" data-color="green" 
+                d="M140,85 C130,80 125,75 130,70 C135,65 145,70 150,75 C145,80 140,85 140,85 Z" />
           
-          <!-- Beak - Yellow (2) -->
-          <path id="beak" class="bird-part" data-number="2" d="M150,120 L130,150 L170,150 Z" />
+          <!-- Right Leaf - Green (pre-colored) -->
+          <path id="right-leaf" class="apple-part" data-color="green" 
+                d="M160,85 C170,80 175,75 170,70 C165,65 155,70 150,75 C155,80 160,85 160,85 Z" />
           
-          <!-- Wings - Dark Purple (3) -->
-          <path id="left-wing" class="bird-part" data-number="3" d="M90,150 C60,130 40,150 60,180 C80,190 90,170 90,150 Z" />
-          <path id="right-wing" class="bird-part" data-number="3" d="M210,150 C240,130 260,150 240,180 C220,190 210,170 210,150 Z" />
-          
-          <!-- Legs - Yellow (2) -->
-          <rect id="left-leg" class="bird-part" data-number="2" x="135" y="220" width="5" height="30" rx="2" />
-          <rect id="right-leg" class="bird-part" data-number="2" x="160" y="220" width="5" height="30" rx="2" />
-          
-          <!-- Feet - Yellow (2) -->
-          <path id="left-foot" class="bird-part" data-number="2" d="M135,250 L125,260 L145,260 Z" />
-          <path id="right-foot" class="bird-part" data-number="2" d="M160,250 L150,260 L170,260 Z" />
-          
-          <!-- Shadow - Gray (5) -->
-          <ellipse id="shadow" class="bird-part" data-number="5" cx="150" cy="270" rx="50" ry="10" />
+          <!-- Stem - Brown -->
+          <rect id="stem" class="apple-part" data-color="brown" 
+                x="148" y="70" width="4" height="15" rx="2" />
         </svg>
       </div>
     </div>
 
     <div class="color-palette">
-      <div class="color-option" style="background-color: #a855fd;" data-color="1" onclick="selectColor(1)">
-        <span>1</span>
+      <div class="color-option" style="background-color: #e53e3e;" data-color="red" onclick="selectColor('red')">
+        <i class="fas fa-apple-alt"></i>
       </div>
-      <div class="color-option" style="background-color: #ffc501;" data-color="2" onclick="selectColor(2)">
-        <span>2</span>
-      </div>
-      <div class="color-option" style="background-color: #3e007f;" data-color="3" onclick="selectColor(3)">
-        <span>3</span>
-      </div>
-      <div class="color-option" style="background-color: #FFFFFF;" data-color="4" onclick="selectColor(4)">
-        <span>4</span>
-      </div>
-      <div class="color-option" style="background-color: #5f5f5f;" data-color="5" onclick="selectColor(5)">
-        <span>5</span>
-      </div>
-      <div class="color-option" style="background-color: #000000;" data-color="6" onclick="selectColor(6)">
-        <span>6</span>
+      <div class="color-option" style="background-color: #38a169;" data-color="green" onclick="selectColor('green')">
+        <i class="fas fa-leaf"></i>
       </div>
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Great job! You colored it correctly! 🎉</div>
+  <div class="popup" id="popupMessage">Great job! You colored it correctly! 🍎</div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -435,56 +427,50 @@
   <script>
     // Define color mappings
     const colorMap = {
-      1: '#a855fd', // Purple (Bird Body)
-      2: '#ffc501', // Yellow (Beak and Legs)
-      3: '#3e007f', // Dark Purple (Wings)
-      4: '#FFFFFF', // White (Eyes)
-      5: '#5f5f5f', // Gray (Shadow)
-      6: '#000000'  // Black (Pupils)
+      red: '#e53e3e',    // Red (Apple Body)
+      green: '#38a169',  // Green (Leaves) - Default
+      brown: '#8b4513'   // Brown (Stem)
     };
 
     let selectedColor = null;
     let completedParts = 0;
-    const totalParts = document.querySelectorAll('.bird-part').length;
+    const totalParts = document.querySelectorAll('.apple-part').length;
     const popup = document.getElementById("popupMessage");
 
-    // Initialize bird parts with their numbers
-    document.querySelectorAll('.bird-part').forEach(part => {
-      const number = part.getAttribute('data-number');
+    // Initialize with leaves already colored green and stem brown
+    function initializeApple() {
+      const leaves = document.querySelectorAll('#left-leaf, #right-leaf');
+      const stem = document.querySelector('#stem');
       
-      // Add number text to the center of each part
-      const bbox = part.getBBox();
-      const textX = bbox.x + bbox.width / 2;
-      const textY = bbox.y + bbox.height / 2;
+      leaves.forEach(leaf => {
+        leaf.style.fill = colorMap.green;
+        leaf.setAttribute('data-filled', 'true');
+        completedParts++;
+      });
       
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("x", textX);
-      text.setAttribute("y", textY);
-      text.setAttribute("text-anchor", "middle");
-      text.setAttribute("dominant-baseline", "middle");
-      text.setAttribute("fill", "black");
-      text.setAttribute("font-size", "14");
-      text.setAttribute("font-weight", "bold");
-      text.setAttribute("pointer-events", "none");
-      text.textContent = number;
-      
-      part.parentNode.appendChild(text);
-      
+      stem.style.fill = colorMap.brown;
+      stem.setAttribute('data-filled', 'true');
+      completedParts++;
+    }
+
+    // Initialize apple parts - no numbers needed
+    document.querySelectorAll('.apple-part').forEach(part => {
       // Add click event to fill with selected color
       part.addEventListener('click', () => colorPart(part));
     });
 
-    function selectColor(number) {
+    function selectColor(colorName) {
       // Deselect previous
       document.querySelectorAll('.color-option').forEach(option => {
         option.classList.remove('selected');
       });
       
       // Select new color
-      selectedColor = number;
-      document.querySelector(`[data-color="${number}"]`).classList.add('selected');
+      selectedColor = colorName;
+      document.querySelector(`[data-color="${colorName}"]`).classList.add('selected');
       
-      showPopup(`Color ${number} selected!`, '#0575e6');
+      const colorNames = {red: 'Red', green: 'Green'};
+      showPopup(`${colorNames[colorName]} selected!`, colorMap[colorName]);
     }
 
     function colorPart(part) {
@@ -493,45 +479,52 @@
         return;
       }
       
-      const correctNumber = parseInt(part.getAttribute('data-number'));
+      const correctColor = part.getAttribute('data-color');
+      const isAlreadyFilled = part.getAttribute('data-filled') === 'true';
       
-      if (selectedColor === correctNumber) {
-        // Correct coloring
-        part.style.fill = colorMap[selectedColor];
-        part.setAttribute('data-filled', 'true');
-        
-        createSparkles(part);
-        showPopup("Great job! That's the right color! 🎉", '#4caf50');
-        
-        // Check if all parts are correctly colored
-        checkCompletion();
-      } else {
-        // Incorrect coloring
-        showPopup(`Try again! This part needs color ${correctNumber}`, '#ff9800');
+      // Skip if it's leaves or stem (already colored)
+      if (correctColor === 'green' || correctColor === 'brown') {
+        showPopup("This part is already colored!", '#2196f3');
+        return;
       }
       
-      // Proceed to next activity after delay regardless of answer
-      setTimeout(() => {
-        let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-        if (selectedColor === correctNumber) {
-          localStorage.setItem('activityScore', score + 1);
+      if (selectedColor === correctColor) {
+        if (!isAlreadyFilled) {
+          // Correct coloring
+          part.style.fill = colorMap[selectedColor];
+          part.setAttribute('data-filled', 'true');
+          completedParts++;
+          
+          createSparkles(part);
+          showPopup("Perfect! Beautiful apple! 🍎", '#4caf50');
+          
+          // Check if all parts are correctly colored
+          checkCompletion();
+        } else {
+          showPopup("This part is already colored correctly!", '#2196f3');
         }
-        window.location.href = 'index.html';
-      }, 2000);
+      } else {
+        // Incorrect coloring - but for apple, only red is needed
+        showPopup("Try the red color for the apple!", '#ff9800');
+        
+        // Add a shake effect
+        part.style.animation = 'shake 0.5s ease-in-out';
+        setTimeout(() => {
+          part.style.animation = '';
+        }, 500);
+      }
     }
 
-    function checkCompletion() {
-      const filledParts = document.querySelectorAll('.bird-part[data-filled="true"]').length;
-      
-      if (filledParts === totalParts) {
+    function checkCompletion() {      
+      if (completedParts === totalParts) {
         setTimeout(() => {
-          showPopup("Amazing! You've completed the coloring! 🎉", '#4caf50');
+          showPopup("🎉 Amazing! You've completed the apple! 🍎✨", '#4caf50');
           
-          // Add big sparkles all over
+          // Add celebration sparkles
           createSparkles(document.querySelector('.drawing-area'));
           createSparkles(document.querySelector('.game-container'));
           
-          // Save progress
+          // Mark success
           markSuccessAndNext();
         }, 1000);
       }
@@ -544,11 +537,11 @@
 
       setTimeout(() => {
         popup.classList.remove("show");
-      }, 2500);
+      }, 3000);
     }
 
     function createSparkles(element) {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 15; i++) {
         const sparkle = document.createElement('div');
         sparkle.classList.add('sparkle');
 
@@ -559,14 +552,14 @@
 
         sparkle.style.left = `${x}px`;
         sparkle.style.top = `${y}px`;
-        sparkle.style.animationDelay = `${Math.random() * 0.5}s`;
+        sparkle.style.animationDelay = `${Math.random() * 0.8}s`;
 
         element.appendChild(sparkle);
 
         // Remove sparkle after animation
         setTimeout(() => {
           sparkle.remove();
-        }, 1000);
+        }, 1200);
       }
     }
 
@@ -574,35 +567,31 @@
       let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
       localStorage.setItem('activityScore', score + 1);
       
-      // In a real app, you'd redirect to the next activity
-      // For now, we'll just show a message
       setTimeout(() => {
-        showPopup("Moving to next activity...", '#6b5ce7');
+        showPopup("Great job! Moving to next activity...", '#6b5ce7');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
       }, 2000);
     }
 
     function skipActivity() {
       showPopup("Skipping this activity...", '#ff9800');
       setTimeout(() => {
-        // In a real app, redirect to next activity
-        // window.location.href = 'next-activity.html';
-        alert("In a real app, this would take you to the next activity.");
+        window.location.href = 'index.html';
       }, 1500);
     }
 
     function goHome() {
       showPopup("Going to home...", '#4caf50');
       setTimeout(() => {
-        // In a real app, redirect to home
-        // window.location.href = 'index.html';
-        alert("In a real app, this would take you to the home page.");
+        window.location.href = 'index.html';
       }, 1500);
     }
 
     function openSettings() {
       showPopup("Opening settings...", '#ff9800');
       setTimeout(() => {
-        // In a real app, open settings
         alert("In a real app, this would open the settings panel.");
       }, 1500);
     }
@@ -610,56 +599,62 @@
     function goBack() {
       showPopup("Going back...", '#f44336');
       setTimeout(() => {
-        // In a real app, go back
         window.history.back();
       }, 1500);
     }
 
-    // Add googly eyes effect
-    document.querySelector('.drawing-area').addEventListener("mousemove", (evt) => {
-      const leftPupil = document.getElementById('left-pupil');
-      const rightPupil = document.getElementById('right-pupil');
-      const leftEye = document.getElementById('left-eye');
-      const rightEye = document.getElementById('right-eye');
-      
-      if (leftPupil && leftPupil.getAttribute('data-filled') === 'true' && 
-          rightPupil && rightPupil.getAttribute('data-filled') === 'true') {
-        
-        // Get eye positions
-        const leftEyePos = leftEye.getBoundingClientRect();
-        const rightEyePos = rightEye.getBoundingClientRect();
-        
-        // Calculate center points
-        const leftX = leftEyePos.left + leftEyePos.width / 2;
-        const leftY = leftEyePos.top + leftEyePos.height / 2;
-        const rightX = rightEyePos.left + rightEyePos.width / 2;
-        const rightY = rightEyePos.top + rightEyePos.height / 2;
-        
-        // Calculate angle for pupils
-        const leftRadian = Math.atan2(evt.clientX - leftX, evt.clientY - leftY);
-        const rightRadian = Math.atan2(evt.clientX - rightX, evt.clientY - rightY);
-        
-        // Limit pupil movement
-        const maxMove = 5;
-        const leftDeltaX = Math.sin(leftRadian) * maxMove;
-        const leftDeltaY = Math.cos(leftRadian) * maxMove;
-        const rightDeltaX = Math.sin(rightRadian) * maxMove;
-        const rightDeltaY = Math.cos(rightRadian) * maxMove;
-        
-        // Update pupil positions
-        leftPupil.setAttribute('cx', 120 + leftDeltaX);
-        leftPupil.setAttribute('cy', 120 + leftDeltaY);
-        rightPupil.setAttribute('cx', 180 + rightDeltaX);
-        rightPupil.setAttribute('cy', 120 + rightDeltaY);
+    // Add shake animation for incorrect attempts
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
       }
-    });
+    `;
+    document.head.appendChild(style);
 
-    // Auto-select the first color when page loads
+    // Initialize the game when page loads
     window.onload = function() {
+      initializeApple();
       setTimeout(() => {
-        selectColor(1);
+        selectColor('red'); // Auto-select red color
+        showPopup("Click on the apple to color it red! 🍎", '#e53e3e');
       }, 1000);
     };
+
+
+
+    // Also play instructions when page is refreshed or reloaded
+window.addEventListener('beforeunload', function() {
+  // Set a flag to indicate the page is being refreshed
+  sessionStorage.setItem('pageRefreshed', 'true');
+});
+
+// Check if page was refreshed and play instructions
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('pageRefreshed') === 'true') {
+    sessionStorage.removeItem('pageRefreshed');
+    setTimeout(() => {
+      playInstructions();
+    }, 500);
+  }
+});
+
+const instructionSound = document.getElementById("instructionSound");
+const soundWave = document.getElementById("soundWave");
+
+function playInstructions() {
+  instructionSound.currentTime = 0;
+  instructionSound.play();
+  soundWave.classList.add("active");
+  showPopup("🎧 Listening to instructions...", '#9c27b0');
+}
+
+// Remove sound wave animation when instruction sound ends
+instructionSound.addEventListener('ended', () => {
+  soundWave.classList.remove("active");
+});
   </script>
 </body>
 </html>

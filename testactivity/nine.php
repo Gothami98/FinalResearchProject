@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+
 
   <style>
     body {
@@ -34,7 +35,7 @@
                   0 5px 15px rgba(0, 0, 0, 0.05),
                   inset 0 0 15px rgba(255, 255, 255, 0.5);
       width: 90%;
-      max-width: 700px;
+      max-width: 800px;
       position: relative;
       overflow: hidden;
     }
@@ -83,18 +84,18 @@
       animation: fadeIn 1s ease-out;
     }
 
-    .apples {
+    .fruits {
       display: flex;
       justify-content: center;
-      gap: 30px;
+      gap: 25px;
       margin: 30px 0;
       flex-wrap: wrap;
+      max-width: 100%;
     }
 
-    .apple {
+    .fruit {
       width: 100px;
       height: 100px;
-      background-image: url('../images/apple1.jpg');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -104,9 +105,13 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
     }
 
-    .apple::after {
+    .fruit::after {
       content: "";
       position: absolute;
       top: 0;
@@ -119,20 +124,32 @@
       pointer-events: none;
     }
 
-    .apple:hover {
+    .fruit:hover {
       transform: translateY(-10px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     }
 
-    .apple:active {
+    .fruit:active {
       transform: scale(0.95);
     }
 
-    .apple.clicked {
+    .fruit.clicked {
       transform: scale(0.9);
       opacity: 0.5;
       pointer-events: none;
       filter: grayscale(0.5);
+    }
+
+    .fruit.apple {
+      background-color: rgba(255, 0, 0, 0.1);
+    }
+
+    .fruit.mango {
+      background-color: rgba(255, 165, 0, 0.1);
+    }
+
+    .fruit.banana {
+      background-color: rgba(255, 255, 0, 0.1);
     }
 
     .popup {
@@ -157,8 +174,6 @@
       opacity: 1;
       transform: translate(-50%, 0);
     }
-
-
 
     /* Confetti effect for correct answers */
     .confetti {
@@ -262,9 +277,102 @@
       50% { transform: translateY(-20px) rotate(5deg); }
       100% { transform: translateY(0) rotate(0deg); }
     }
+
+    .instruction-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #9c27b0;
+      color: white;
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      font-family: 'Bubblegum Sans', cursive;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+    }
+
+    .instruction-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+      background-color: #7b1fa2;
+    }
+
+    .instruction-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .instruction-button i {
+      margin-right: 8px;
+    }
+
+    .sound-wave {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      margin-bottom: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .sound-wave.active {
+      opacity: 1;
+    }
+
+    .wave-bar {
+      width: 6px;
+      background-color: #4caf50;
+      border-radius: 3px;
+      animation: sound-wave 1s infinite ease-in-out alternate;
+    }
+
+    @keyframes sound-wave {
+      0% { transform: scaleY(0.5); }
+      100% { transform: scaleY(1); }
+    }
+
+   
+    .skip-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ff9800;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+    }
+
+    .skip-fixed:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .counter-display {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      color: #666;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+
+<button class="instruction-button" onclick="playInstructions()">
+  <i class="fas fa-volume-up"></i>Instructions
+</button>
+
+<audio id="instructionSound" src="../Audio/9.mp3"></audio>
+
   <!-- Navigation Icons -->
     <div class="nav-icons">
       <div class="nav-icon home" onclick="goHome()">
@@ -290,46 +398,90 @@
   <div class="shape triangle-2"></div>
 
   <div class="game-container">
-    <h2>Count from 1 to 5</h2>
-    <p id="instruction">Count the apples by clicking on each one.</p>
+    <h2>Count the Apples</h2>
+    <p id="instruction">Find and click on 3 apples from the fruits below.</p>
 
-    <div class="apples">
-      <div class="apple" onclick="countApple(this)"></div>
-      <div class="apple" onclick="countApple(this)"></div>
-      <div class="apple" onclick="countApple(this)"></div>
-      <div class="apple" onclick="countApple(this)"></div>
-      <div class="apple" onclick="countApple(this)"></div>
+    <div class="fruits" id="fruitsContainer">
+      <!-- Fruits will be generated dynamically -->
+    </div>
+
+    <div class="counter-display">
+      Apples found: <span id="appleCount">0</span> / 3
     </div>
   </div>
 
   <!-- Popup message -->
-  <div class="popup" id="popupMessage">Let's begin! 🍎</div>
+  <div class="popup" id="popupMessage">Let's find the apples! 🍎</div>
 
   <script>
-    let count = 0;
+    let appleCount = 0;
     const popup = document.getElementById("popupMessage");
+    const appleCountDisplay = document.getElementById("appleCount");
     
-    // Show startup popup
-    showPopup("Let's begin! 🍎", "#ff6f61");
+    // Fruit emojis and their types
+    const fruits = [
+      { emoji: '🍎', type: 'apple' },
+      { emoji: '🍎', type: 'apple' },
+      { emoji: '🍎', type: 'apple' },
+      { emoji: '🥭', type: 'mango' },
+      { emoji: '🥭', type: 'mango' },
+      { emoji: '🍌', type: 'banana' },
+      { emoji: '🍌', type: 'banana' },
+      { emoji: '🥭', type: 'mango' }
+    ];
 
-    function countApple(element) {
+    // Shuffle the fruits array
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Initialize the game
+    function initGame() {
+      const shuffledFruits = shuffleArray([...fruits]);
+      const container = document.getElementById('fruitsContainer');
+      
+      shuffledFruits.forEach((fruit, index) => {
+        const fruitElement = document.createElement('div');
+        fruitElement.className = `fruit ${fruit.type}`;
+        fruitElement.textContent = fruit.emoji;
+        fruitElement.onclick = () => clickFruit(fruitElement, fruit.type);
+        container.appendChild(fruitElement);
+      });
+    }
+
+    // Show startup popup
+    showPopup("Let's find the apples! 🍎", "#ff6f61");
+
+    function clickFruit(element, type) {
       if (!element.classList.contains('clicked')) {
         element.classList.add('clicked');
-        count++;
         
-        if (count === 5) {
-          showPopup("Fantastic! You counted all five apples! 🍏", "#4caf50");
-          createConfetti();
-          // Add mark for correct answer
-          let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
-          localStorage.setItem('activityScore', score + 1);
+        if (type === 'apple') {
+          appleCount++;
+          appleCountDisplay.textContent = appleCount;
           
-          // Only proceed to next activity after all apples are clicked
-          setTimeout(() => {
-            window.location.href = 'ten.php';
-          }, 2000);
+          if (appleCount === 3) {
+            showPopup("Fantastic! You found all 3 apples! 🍏✨", "#4caf50");
+            createConfetti();
+            
+            // Add mark for correct answer
+            let score = parseInt(localStorage.getItem('activityScore') || '0', 10);
+            localStorage.setItem('activityScore', score + 1);
+            
+            // Proceed to next activity after completing the task
+            setTimeout(() => {
+              window.location.href = 'ten.php';
+            }, 2500);
+          } else {
+            showPopup(`Great! You found ${appleCount} apple${appleCount > 1 ? 's' : ''}. Find ${3 - appleCount} more! 🍎`, "#ff9800");
+          }
         } else {
-          showPopup(`Good job! You clicked ${count} apple${count > 1 ? 's' : ''}. Keep going! 🍎`, "#ff9800");
+          // Clicked on mango or banana - give encouraging feedback
+          showPopup(`That's a ${type}! Look for the red apples 🍎`, "#2196f3");
         }
       }
     }
@@ -387,6 +539,46 @@
         }, 5000);
       }
     }
+
+    window.onload = function() {
+      localStorage.setItem('activityScore', '0');
+      initGame();
+      
+      // Play instructions automatically when page loads
+      setTimeout(() => {
+        playInstructions();
+      }, 500);
+    };
+
+    // Also play instructions when page is refreshed or reloaded
+    window.addEventListener('beforeunload', function() {
+      sessionStorage.setItem('pageRefreshed', 'true');
+    });
+
+    // Check if page was refreshed and play instructions
+    document.addEventListener('DOMContentLoaded', function() {
+      if (sessionStorage.getItem('pageRefreshed') === 'true') {
+        sessionStorage.removeItem('pageRefreshed');
+        setTimeout(() => {
+          playInstructions();
+        }, 500);
+      }
+    });
+
+    const instructionSound = document.getElementById("instructionSound");
+    const soundWave = document.getElementById("soundWave");
+
+    function playInstructions() {
+      instructionSound.currentTime = 0;
+      instructionSound.play();
+      if (soundWave) soundWave.classList.add("active");
+      showPopup("🎧 Listening to instructions...", '#9c27b0');
+    }
+
+    // Remove sound wave animation when instruction sound ends
+    instructionSound.addEventListener('ended', () => {
+      if (soundWave) soundWave.classList.remove("active");
+    });
   </script>
 </body>
 </html>

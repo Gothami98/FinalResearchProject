@@ -264,9 +264,74 @@
       50% { transform: translateY(-20px) rotate(5deg); }
       100% { transform: translateY(0) rotate(0deg); }
     }
+
+
+    .instruction-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: #9c27b0;
+  color: white;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  font-family: 'Bubblegum Sans', cursive;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.instruction-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  background-color: #7b1fa2;
+}
+
+.instruction-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.instruction-button i {
+  margin-right: 8px;
+}
+
+
+.sound-wave {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  margin-bottom: 10px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.sound-wave.active {
+  opacity: 1;
+}
+
+.wave-bar {
+  width: 6px;
+  background-color: #4caf50;
+  border-radius: 3px;
+  animation: sound-wave 1s infinite ease-in-out alternate;
+}
+
+@keyframes sound-wave {
+  0% { transform: scaleY(0.5); }
+  100% { transform: scaleY(1); }
+}
   </style>
 </head>
 <body>
+
+
+<button class="instruction-button" onclick="playInstructions()">
+  <i class="fas fa-volume-up"></i>Instructions
+</button>
   <!-- Navigation Icons -->
   <div class="nav-icons">
     <div class="nav-icon home" onclick="goHome()">
@@ -280,7 +345,7 @@
     </div>
   </div>
 
-  
+  <audio id="instructionSound" src="../Audio/5.mp3"></audio>
   <!-- Skip button -->
   <button class="skip-fixed" onclick="skipActivity()"><i class="fas fa-forward"></i>Skip</button>
 
@@ -444,6 +509,49 @@
         window.location.href = 'six.php';
       }, 1500);
     }
+
+
+
+    window.onload = function() {
+  localStorage.setItem('activityScore', '0');
+  
+  // Play instructions automatically when page loads
+  setTimeout(() => {
+    playInstructions();
+  }, 500); // Small delay to ensure page is fully loaded
+};
+
+// Also play instructions when page is refreshed or reloaded
+window.addEventListener('beforeunload', function() {
+  // Set a flag to indicate the page is being refreshed
+  sessionStorage.setItem('pageRefreshed', 'true');
+});
+
+// Check if page was refreshed and play instructions
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('pageRefreshed') === 'true') {
+    sessionStorage.removeItem('pageRefreshed');
+    setTimeout(() => {
+      playInstructions();
+    }, 500);
+  }
+});
+
+
+const instructionSound = document.getElementById("instructionSound");
+const soundWave = document.getElementById("soundWave");
+
+function playInstructions() {
+  instructionSound.currentTime = 0;
+  instructionSound.play();
+  soundWave.classList.add("active");
+  showPopup("🎧 Listening to instructions...", '#9c27b0');
+}
+
+// Remove sound wave animation when instruction sound ends
+instructionSound.addEventListener('ended', () => {
+  soundWave.classList.remove("active");
+});
 
   </script>
 </body>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Object Sorting Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .categories {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+        
+        .category {
+            background: #e3f2fd;
+            border: 4px dashed #2196f3;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 200px;
+            width: 400px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .category.drag-over {
+            border-color: #e74c3c;
+            background: #fff5f5;
+            transform: scale(1.05);
+        }
+        
+        .category h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .objects-area {
+            background: #ecf0f1;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .objects-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .objects-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .object {
+            width: 100px;
+            height: 100px;
+            border-radius: 15px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 4px solid #34495e;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .object.circle {
+            border-radius: 50%;
+            border-color: #333;
+        }
+        
+        .object.square {
+            border-radius: 8px;
+            border-color: #333;
+        }
+        
+        .object.triangle {
+            border-color: #333;
+            border-radius: 8px;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        
+        .object:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .object:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        
+        .object.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 1.5em;
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .categories {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .objects-container {
+                gap: 15px;
+            }
+            
+            .object {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🔵 Find All the Circles!</h1>
+        
+        <div class="score">Score: <span id="score">0</span></div>
+        
+        <div class="categories">
+            <div class="category" data-type="circle">
+                <h3>🔵 Circles</h3>
+                <p style="font-size: 1.2em; color: #7f8c8d; margin-top: 10px;">Drop all circles here!</p>
+                <div class="category-items" id="circle-items"></div>
+            </div>
+        </div>
+        
+        <div class="objects-area">
+            <h3 class="objects-title">Click and drag all the CIRCLES to the blue box:</h3>
+            <div class="objects-container" id="objects-container">
+                <!-- Objects will be dynamically added here -->
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <button class="reset-btn" onclick="resetGame()">🔄 New Game</button>
+    </div>
+
+    <script>
+        const colors = [
+            '#ff6b6b', // Red
+            '#4ecdc4', // Teal
+            '#45b7d1', // Blue
+            '#96ceb4', // Green
+            '#feca57', // Yellow
+            '#ff9ff3', // Pink
+            '#54a0ff', // Light Blue
+            '#5f27cd', // Purple
+            '#00d2d3', // Cyan
+            '#ff9f43', // Orange
+            '#10ac84', // Dark Green
+            '#ee5a6f'  // Rose
+        ];
+        
+        function getRandomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        const shapes = [
+            // Circles - these are the correct answers
+            { shape: 'circle', color: getRandomColor(), name: 'circle' },
+            { shape: 'circle', color: getRandomColor(), name: 'circle' },
+            { shape: 'circle', color: getRandomColor(), name: 'circle' },
+            { shape: 'circle', color: getRandomColor(), name: 'circle' },
+            { shape: 'circle', color: getRandomColor(), name: 'circle' },
+            
+            // Squares - these are distractors
+            { shape: 'square', color: getRandomColor(), name: 'square' },
+            { shape: 'square', color: getRandomColor(), name: 'square' },
+            { shape: 'square', color: getRandomColor(), name: 'square' },
+            { shape: 'square', color: getRandomColor(), name: 'square' },
+            
+            // Triangles - these are distractors
+            { shape: 'triangle', color: getRandomColor(), name: 'triangle' },
+            { shape: 'triangle', color: getRandomColor(), name: 'triangle' },
+            { shape: 'triangle', color: getRandomColor(), name: 'triangle' },
+            { shape: 'triangle', color: getRandomColor(), name: 'triangle' }
+        ];
+        
+        let currentShapes = [];
+        let score = 0;
+        let totalCircles = 0;
+        
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        function selectRandomShapes() {
+            // Regenerate colors for each new game
+            shapes.forEach(shape => {
+                shape.color = getRandomColor();
+            });
+            
+            // Always include some circles (3-4), and some other shapes
+            const circles = shapes.filter(shape => shape.shape === 'circle');
+            const squares = shapes.filter(shape => shape.shape === 'square');
+            const triangles = shapes.filter(shape => shape.shape === 'triangle');
+            
+            const numCircles = 3 + Math.floor(Math.random() * 2); // 3 or 4 circles
+            const numOthers = 8 - numCircles; // remaining shapes
+            
+            const selected = [
+                ...circles.slice(0, numCircles),
+                ...squares.slice(0, Math.floor(numOthers / 2)),
+                ...triangles.slice(0, Math.ceil(numOthers / 2))
+            ];
+            
+            totalCircles = numCircles;
+            return shuffleArray(selected);
+        }
+        
+        function createShapeElement(shape, index) {
+            const div = document.createElement('div');
+            div.className = `object ${shape.shape}`;
+            div.draggable = true;
+            div.dataset.shape = shape.shape;
+            div.dataset.name = shape.name;
+            div.dataset.index = index;
+            div.style.backgroundColor = shape.color;
+            
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+            
+            return div;
+        }
+        
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.index);
+            e.target.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function setupCategories() {
+            const categories = document.querySelectorAll('.category');
+            
+            categories.forEach(category => {
+                category.addEventListener('dragover', handleDragOver);
+                category.addEventListener('drop', handleDrop);
+                category.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const shapeIndex = e.dataTransfer.getData('text/plain');
+            const shape = currentShapes[shapeIndex];
+            const categoryType = e.currentTarget.dataset.type;
+            
+            const shapeElement = document.querySelector(`[data-index="${shapeIndex}"]`);
+            
+            if (shape.shape === 'circle' && categoryType === 'circle') {
+                // Correct placement - it's a circle
+                const categoryItems = e.currentTarget.querySelector('.category-items');
+                categoryItems.appendChild(shapeElement);
+                shapeElement.draggable = false;
+                shapeElement.style.cursor = 'default';
+                shapeElement.style.opacity = '0.8';
+                
+                score += 10;
+                updateScore();
+                showFeedback(`Great job! That's a circle! 🔵`, 'success');
+                
+                checkGameComplete();
+            } else if (shape.shape !== 'circle' && categoryType === 'circle') {
+                // Incorrect placement - trying to put non-circle in circle box
+                showFeedback(`Try again! That's a ${shape.name}, not a circle!`, 'error');
+                
+                // Animate back to original position
+                shapeElement.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    shapeElement.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 3000);
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function checkGameComplete() {
+            const circlesInBox = document.querySelectorAll('#circle-items .object').length;
+            
+            if (circlesInBox === totalCircles) {
+                setTimeout(() => {
+                    showFeedback(`🎉 Perfect! You found all ${totalCircles} circles!`, 'success');
+                }, 500);
+            }
+        }
+        
+        function resetGame() {
+            // Clear category
+            document.getElementById('circle-items').innerHTML = '';
+            
+            // Clear objects container
+            document.getElementById('objects-container').innerHTML = '';
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Select new random shapes
+            currentShapes = selectRandomShapes();
+            
+            // Create new shape elements
+            const container = document.getElementById('objects-container');
+            currentShapes.forEach((shape, index) => {
+                const element = createShapeElement(shape, index);
+                container.appendChild(element);
+            });
+            
+            // Reset score for new game
+            score = 0;
+            updateScore();
+        }
+        
+        // Add CSS animation for shake effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize game
+        setupCategories();
+        resetGame();
+    </script>
+</body>
+</html>
