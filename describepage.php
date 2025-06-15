@@ -279,7 +279,7 @@
 
     /* Enhanced Paragraph Box with New Design */
     .paragraph-box {
-      background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 50%, #e8f4fd 100%);
+      /* background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 50%, #e8f4fd 100%); */
       border-radius: 30px;
       padding: 35px 40px;
       box-shadow: 
@@ -469,7 +469,7 @@
     }
 
     /* Enhanced Highlighted text during audio playback */
-    .highlight {
+    /* .highlight {
       background: linear-gradient(120deg, #ffeb3b 0%, #fff176 100%);
       padding: 4px 8px;
       border-radius: 12px;
@@ -477,7 +477,7 @@
       box-shadow: 0 4px 12px rgba(255, 235, 59, 0.4);
       animation: gentlePulse 2s ease-in-out infinite;
       position: relative;
-    }
+    } */
 
     @keyframes gentlePulse {
       0%, 100% { 

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Round Shapes Identification Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f8ff, #cce7ff);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .scene-container {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+            border: 3px solid #ff6b9d;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .shapes-area {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #ff6b9d;
+        }
+        
+        .click-instruction {
+            text-align: center;
+            font-size: 1.4em;
+            color: #34495e;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-weight: bold;
+        }
+        
+        .shape {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: shapeFloat 3s ease-in-out infinite;
+            user-select: none;
+        }
+        
+        .shape:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
+        }
+        
+        .shape.clicked {
+            opacity: 0.3;
+            transform: scale(0.8);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .shape.correct-click {
+            animation: correctPulse 0.8s ease-in-out;
+            border-color: #28a745;
+            box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+        }
+        
+        .shape.incorrect-click {
+            animation: errorShake 0.6s ease-in-out;
+            border-color: #dc3545;
+            box-shadow: 0 0 30px rgba(220, 53, 69, 0.8);
+        }
+        
+        .circle {
+            border-radius: 50%;
+        }
+        
+        .square {
+            border-radius: 8px;
+        }
+        
+        .triangle {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-radius: 5px;
+            background: transparent !important;
+        }
+        
+        .rectangle {
+            border-radius: 8px;
+        }
+        
+        .oval {
+            border-radius: 50%;
+        }
+        
+        .diamond {
+            transform: rotate(45deg);
+            border-radius: 8px;
+        }
+        
+        .diamond:hover {
+            transform: rotate(45deg) scale(1.2);
+        }
+        
+        .hexagon {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 1.8em;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 25px auto;
+            padding: 18px 40px;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
+        }
+        
+        .floating-sparkles {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            right: 20px;
+            pointer-events: none;
+        }
+        
+        .sparkle {
+            position: absolute;
+            font-size: 1.5em;
+            opacity: 0.7;
+            animation: sparkleFloat 4s ease-in-out infinite;
+        }
+        
+        .sparkle:nth-child(1) { left: 10%; top: 20px; animation-delay: 0s; }
+        .sparkle:nth-child(2) { right: 15%; top: 40px; animation-delay: 1s; }
+        .sparkle:nth-child(3) { left: 60%; top: 10px; animation-delay: 2s; }
+        .sparkle:nth-child(4) { left: 80%; top: 60px; animation-delay: 3s; }
+        
+        @media (max-width: 768px) {
+            .shapes-area {
+                height: 350px;
+            }
+            
+            .shape {
+                transform: scale(0.8);
+            }
+            
+            .score-level-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+        
+        @keyframes shapeFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        @keyframes sparkleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(180deg); }
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.3); box-shadow: 0 0 30px rgba(40, 167, 69, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🔵 Round Shapes Game 🟡</h1>
+        
+        <div class="instructions">
+            Look at all the shapes! Find and click only the ROUND ones like circles and ovals!
+        </div>
+        
+        <div class="click-instruction">
+            👆 Click on all the ROUND shapes you can find!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="scene-container">
+            <div class="question" id="question">Find all the ROUND shapes!</div>
+            <div class="shapes-area" id="shapes-area">
+                <div class="floating-sparkles">
+                    <div class="sparkle">✨</div>
+                    <div class="sparkle">⭐</div>
+                    <div class="sparkle">💫</div>
+                    <div class="sparkle">🌟</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Level ➡️</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let currentShapes = [];
+        let roundShapesFound = 0;
+        let totalRoundShapes = 0;
+        let gameComplete = false;
+        
+        const shapeTypes = [
+            { name: 'circle', isRound: true },
+            { name: 'square', isRound: false },
+            { name: 'triangle', isRound: false },
+            { name: 'rectangle', isRound: false },
+            { name: 'oval', isRound: true },
+            { name: 'diamond', isRound: false },
+            { name: 'hexagon', isRound: false }
+        ];
+        
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
+            '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#FF8A80', '#82B1FF', '#B39DDB', '#A5D6A7',
+            '#FFAB91', '#80CBC4', '#C5E1A5', '#F48FB1'
+        ];
+        
+        const successMessages = [
+            "Perfect! That's a round shape! 🌟",
+            "Excellent! Circles are round! ⭐",
+            "Super job! You found a round one! 🎉",
+            "Fantastic! Ovals are round too! 🚀",
+            "Amazing! Great shape recognition! 🏆",
+            "Brilliant! Keep finding the round ones! 💫"
+        ];
+        
+        const errorMessages = [
+            "Not quite! That shape has corners! 🔍",
+            "Try again! Round shapes are smooth and curved! 💭",
+            "Almost! Look for shapes without corners! 👀",
+            "Good try! Round shapes are like balls! 🤔",
+            "Keep learning! Round means no sharp edges! 📚"
+        ];
+        
+        const completionMessages = [
+            "🎊 Amazing! You found all the round shapes! 🎊",
+            "🌟 Fantastic work! All round shapes discovered! 🌟",
+            "🎉 Perfect! You're a shape expert! 🎉",
+            "🚀 Incredible! Round shape master! 🚀",
+            "⭐ Outstanding! You did it perfectly! ⭐"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        
+        function generateShapes() {
+            const shapesArea = document.getElementById('shapes-area');
+            
+            // Clear existing shapes
+            const existingShapes = shapesArea.querySelectorAll('.shape');
+            existingShapes.forEach(shape => shape.remove());
+            
+            currentShapes = [];
+            roundShapesFound = 0;
+            totalRoundShapes = 0;
+            gameComplete = false;
+            
+            // Generate shapes based on level
+            const numShapes = Math.min(6 + level, 12);
+            const areaRect = shapesArea.getBoundingClientRect();
+            const maxX = 300;
+            const maxY = 300;
+            
+            for (let i = 0; i < numShapes; i++) {
+                const shapeType = getRandomItem(shapeTypes);
+                const color = getRandomItem(colors);
+                const size = 40 + Math.random() * 40;
+                
+                let x, y, attempts = 0;
+                do {
+                    x = Math.random() * (maxX - size) + 20;
+                    y = Math.random() * (maxY - size) + 60;
+                    attempts++;
+                } while (attempts < 20 && isOverlapping(x, y, size));
+                
+                const shape = {
+                    id: i,
+                    type: shapeType.name,
+                    isRound: shapeType.isRound,
+                    color: color,
+                    size: size,
+                    x: x,
+                    y: y,
+                    clicked: false
+                };
+                
+                currentShapes.push(shape);
+                if (shape.isRound) {
+                    totalRoundShapes++;
+                }
+                createShapeElement(shape);
+            }
+            
+            // Update question based on round shapes count
+            const question = document.getElementById('question');
+            if (totalRoundShapes === 1) {
+                question.textContent = "Find the ROUND shape!";
+            } else {
+                question.textContent = `Find all ${totalRoundShapes} ROUND shapes!`;
+            }
+        }
+        
+        function isOverlapping(x, y, size) {
+            return currentShapes.some(shape => {
+                const dx = Math.abs(shape.x - x);
+                const dy = Math.abs(shape.y - y);
+                const minDistance = (shape.size + size) / 2 + 15;
+                return dx < minDistance && dy < minDistance;
+            });
+        }
+        
+        function createShapeElement(shape) {
+            const shapeEl = document.createElement('div');
+            shapeEl.className = `shape ${shape.type}`;
+            shapeEl.id = `shape-${shape.id}`;
+            shapeEl.style.left = shape.x + 'px';
+            shapeEl.style.top = shape.y + 'px';
+            shapeEl.style.backgroundColor = shape.color;
+            shapeEl.style.animationDelay = Math.random() * 2 + 's';
+            
+            if (shape.type === 'triangle') {
+                shapeEl.style.borderLeft = `${shape.size/2}px solid transparent`;
+                shapeEl.style.borderRight = `${shape.size/2}px solid transparent`;
+                shapeEl.style.borderBottom = `${shape.size}px solid ${shape.color}`;
+                shapeEl.style.backgroundColor = 'transparent';
+            } else if (shape.type === 'rectangle') {
+                shapeEl.style.width = shape.size * 1.5 + 'px';
+                shapeEl.style.height = shape.size * 0.8 + 'px';
+            } else if (shape.type === 'oval') {
+                shapeEl.style.width = shape.size * 1.4 + 'px';
+                shapeEl.style.height = shape.size * 0.9 + 'px';
+            } else {
+                shapeEl.style.width = shape.size + 'px';
+                shapeEl.style.height = shape.size + 'px';
+            }
+            
+            shapeEl.onclick = () => handleShapeClick(shape.id);
+            document.getElementById('shapes-area').appendChild(shapeEl);
+        }
+        
+        function handleShapeClick(shapeId) {
+            const shape = currentShapes.find(s => s.id === shapeId);
+            if (!shape || shape.clicked || gameComplete) return;
+            
+            shape.clicked = true;
+            const shapeEl = document.getElementById(`shape-${shapeId}`);
+            const feedback = document.getElementById('feedback');
+            
+            if (shape.isRound) {
+                // Correct answer
+                score += 10;
+                roundShapesFound++;
+                
+                shapeEl.classList.add('clicked', 'correct-click');
+                
+                const message = getRandomItem(successMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback success';
+                
+                // Check if all round shapes are found
+                if (roundShapesFound === totalRoundShapes) {
+                    setTimeout(() => {
+                        gameComplete = true;
+                        const celebration = document.getElementById('celebration');
+                        const completionMsg = getRandomItem(completionMessages);
+                        
+                        celebration.textContent = completionMsg;
+                        celebration.classList.add('show');
+                        
+                        feedback.textContent = `🎉 Level ${level} Complete! You found all ${totalRoundShapes} round shapes! 🎉`;
+                        feedback.className = 'feedback success';
+                        
+                        document.getElementById('next-btn').classList.add('show');
+                    }, 1000);
+                }
+                
+            } else {
+                // Wrong answer
+                shapeEl.classList.add('clicked', 'incorrect-click');
+                
+                const message = getRandomItem(errorMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback error';
+                
+                // Remove incorrect styling after animation
+                setTimeout(() => {
+                    shapeEl.classList.remove('incorrect-click');
+                }, 600);
+            }
+            
+            updateScore();
+            
+            // Clear feedback after some time
+            setTimeout(() => {
+                if (!gameComplete) {
+                    feedback.textContent = '';
+                    feedback.className = 'feedback';
+                }
+            }, 3000);
+        }
+        
+        function nextLevel() {
+            level++;
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            
+            updateLevel();
+            generateShapes();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        // Initialize game
+        updateScore();
+        updateLevel();
+        generateShapes();
+    </script>
+</body>
+</html>

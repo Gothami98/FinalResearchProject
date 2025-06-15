@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Selection Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fad0c4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f8ff, #cce7ff);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .containers-display {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .container-option {
+            background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 4px solid #27ae60;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .container-option:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(39, 174, 96, 0.3);
+        }
+        
+        .container-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .container-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: successPulse 1s ease-in-out;
+        }
+        
+        .container-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .container-scene {
+            position: relative;
+            width: 250px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            position: absolute;
+            width: 180px;
+            height: 130px;
+            border: 5px solid #2c3e50;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .container.box {
+            border-radius: 10px;
+        }
+        
+        .container.circle {
+            border-radius: 50%;
+        }
+        
+        .container.basket {
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            border-top: none;
+            background: linear-gradient(135deg, #d2b48c, #daa520);
+        }
+        
+        .object {
+            font-size: 2.5em;
+            position: absolute;
+            animation: float 2s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .object.inside {
+            z-index: 10;
+        }
+        
+        .object.outside {
+            z-index: 5;
+        }
+        
+        .option-label {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 1.8em;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .progress-bar {
+            background: #ecf0f1;
+            border-radius: 12px;
+            height: 24px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 2px solid #bdc3c7;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 25px auto;
+            padding: 18px 40px;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .containers-display {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            
+            .container-option {
+                min-width: 280px;
+            }
+            
+            .container-scene {
+                width: 220px;
+                height: 160px;
+            }
+            
+            .container {
+                width: 160px;
+                height: 110px;
+            }
+            
+            .object {
+                font-size: 2em;
+            }
+            
+            .score-level-container {
+                flex-direction: column;
+            }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🎯 Find the Object Inside! 🔍</h1>
+        
+        <div class="instructions">
+            Click on the container that has an object INSIDE it!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        
+        <div class="question" id="question">Which container has an object inside?</div>
+        
+        <div class="containers-display" id="containers-display">
+            <!-- Container options will be dynamically created here -->
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➡️</button>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let score = 0;
+        let level = 1;
+        let questionsPerLevel = 6;
+        let correctOption = 0;
+        let answered = false;
+        
+        const containers = [
+            { type: 'box', name: 'box' },
+            { type: 'circle', name: 'circle' },
+            { type: 'basket', name: 'basket' }
+        ];
+        
+        const objects = [
+            '🎾', '⚽', '🏀', '🎱', '🏈', '🎈',
+            '🍎', '🍊', '🍌', '🍓', '🥝', '🍇',
+            '⭐', '❤️', '💎', '🔥', '⚡', '🌟',
+            '🧸', '🎁', '🎀', '🚗', '✈️', '🚀',
+            '🦋', '🌸', '🌺', '🌻', '🌷', '🌹'
+        ];
+        
+        const encouragements = [
+            "Perfect! You found it! 🌟",
+            "Excellent detective work! ⭐",
+            "Super job! You have great observation skills! 🎉",
+            "Fantastic! You're a pro at this! 🚀",
+            "Amazing! Keep up the great work! 🏆",
+            "Brilliant! You found the hidden object! 💫"
+        ];
+        
+        const corrections = [
+            "Not quite! Look more carefully! 🔍",
+            "Try again! Check which one has something inside! 💭",
+            "Almost! Look closer at both containers! 👀",
+            "Good try! The other container has the object inside! 🤔",
+            "Keep trying! You're learning! 📚"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        
+        function createContainerScene(hasObject, containerType, objectEmoji) {
+            const scene = document.createElement('div');
+            scene.className = 'container-scene';
+            
+            // Create container
+            const container = document.createElement('div');
+            container.className = `container ${containerType.type}`;
+            
+            if (hasObject) {
+                // Create object inside container
+                const object = document.createElement('div');
+                object.className = 'object inside';
+                object.textContent = objectEmoji;
+                container.appendChild(object);
+            }
+            
+            scene.appendChild(container);
+            return scene;
+        }
+        
+        function generateQuestion() {
+            const display = document.getElementById('containers-display');
+            display.innerHTML = '';
+            
+            // Randomly decide which option (0 or 1) has the object inside
+            correctOption = Math.floor(Math.random() * 2);
+            
+            // Get random container types and object
+            const containerType1 = getRandomItem(containers);
+            const containerType2 = getRandomItem(containers);
+            const objectEmoji = getRandomItem(objects);
+            
+            // Create two container options
+            for (let i = 0; i < 2; i++) {
+                const option = document.createElement('div');
+                option.className = 'container-option';
+                option.onclick = () => checkAnswer(i);
+                
+                const containerType = i === 0 ? containerType1 : containerType2;
+                const hasObject = i === correctOption;
+                
+                const scene = createContainerScene(hasObject, containerType, objectEmoji);
+                option.appendChild(scene);
+                
+                const label = document.createElement('div');
+                label.className = 'option-label';
+                label.textContent = `Container ${i + 1}`;
+                option.appendChild(label);
+                
+                display.appendChild(option);
+            }
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            
+            answered = false;
+        }
+        
+        function checkAnswer(selectedOption) {
+            if (answered) return;
+            
+            answered = true;
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('next-btn');
+            const celebration = document.getElementById('celebration');
+            const options = document.querySelectorAll('.container-option');
+            
+            // Disable all options
+            options.forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            if (selectedOption === correctOption) {
+                score += 10;
+                const encouragement = getRandomItem(encouragements);
+                feedback.textContent = encouragement;
+                feedback.className = 'feedback success';
+                
+                // Highlight correct option
+                options[correctOption].classList.add('correct');
+                
+                // Show celebration
+                celebration.textContent = '🎉 Correct! 🎉';
+                celebration.classList.add('show');
+                
+            } else {
+                const correction = getRandomItem(corrections);
+                feedback.textContent = `${correction} Container ${correctOption + 1} had the object inside!`;
+                feedback.className = 'feedback error';
+                
+                // Highlight correct and incorrect options
+                options[selectedOption].classList.add('incorrect');
+                options[correctOption].classList.add('correct');
+            }
+            
+            updateScore();
+            nextBtn.classList.add('show');
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            updateProgress();
+            
+            if (currentQuestion % questionsPerLevel === 0) {
+                levelUp();
+            }
+            
+            generateQuestion();
+        }
+        
+        function levelUp() {
+            level++;
+            const celebration = document.getElementById('celebration');
+            celebration.textContent = `🎊 Level ${level} Unlocked! 🎊`;
+            celebration.classList.add('show');
+            
+            setTimeout(() => {
+                celebration.classList.remove('show');
+            }, 2500);
+            
+            updateLevel();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        function updateProgress() {
+            const progress = ((currentQuestion % questionsPerLevel) / questionsPerLevel) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+        
+        // Initialize game
+        generateQuestion();
+        updateScore();
+        updateLevel();
+        updateProgress();
+    </script>
+</body>
+</html>

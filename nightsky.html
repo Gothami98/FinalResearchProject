@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Identification - Night Sky Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 30, 0.8);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            min-height: 90vh;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3.5em;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.8em;
+            color: #b8c6db;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, rgba(184, 198, 219, 0.2), rgba(255, 255, 255, 0.1));
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid #4a90e2;
+            font-weight: bold;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .stars-found {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .current-challenge {
+            text-align: center;
+            font-size: 2.2em;
+            color: #fff;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 15px;
+            border: 3px solid #4a90e2;
+            font-weight: bold;
+            animation: starPulse 2s ease-in-out infinite;
+        }
+        
+        .night-sky {
+            position: relative;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0c0c1e 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 500px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #ffffff 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, #ffffff 0.5px, transparent 0.5px),
+                radial-gradient(circle at 75% 75%, #ffffff 0.8px, transparent 0.8px);
+            background-size: 100px 100px, 150px 150px, 200px 200px;
+            animation: backgroundTwinkle 4s ease-in-out infinite;
+        }
+        
+        .star {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 2em;
+            user-select: none;
+            filter: drop-shadow(0 0 10px currentColor);
+            animation: starFloat 3s ease-in-out infinite;
+            color: #fff;
+        }
+        
+        .star:hover {
+            transform: scale(1.5);
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+        
+        .star.identified {
+            animation: identified 1s ease-in-out;
+            color: #4a90e2;
+            filter: drop-shadow(0 0 15px #4a90e2);
+        }
+        
+        .star.correct {
+            animation: correctStar 1s ease-in-out;
+            color: #00b894;
+            filter: drop-shadow(0 0 20px #00b894);
+        }
+        
+        .star.incorrect {
+            animation: shake 0.5s ease-in-out;
+            color: #e74c3c;
+            filter: drop-shadow(0 0 20px #e74c3c);
+        }
+        
+        .constellation-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .constellation-line {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .constellation-line.visible {
+            opacity: 1;
+        }
+        
+        .star-info {
+            display: none;
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #4a90e2;
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            max-width: 300px;
+            z-index: 100;
+            font-size: 1.2em;
+        }
+        
+        .star-info.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .star-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        .star-fact {
+            color: #b8c6db;
+            line-height: 1.4;
+        }
+        
+        .progress-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .progress-star {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 30, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-star.found {
+            border-color: #4a90e2;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(118, 75, 162, 0.3));
+            animation: progressComplete 0.5s ease-in-out;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2.2em;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.3), rgba(0, 206, 201, 0.3));
+            color: #00b894;
+            border: 3px solid #00b894;
+            animation: successGlow 1s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.3), rgba(220, 53, 69, 0.3));
+            color: #e74c3c;
+            border: 3px solid #e74c3c;
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        .completion-celebration {
+            text-align: center;
+            font-size: 3em;
+            color: #4a90e2;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 20px;
+            border: 3px solid #4a90e2;
+            display: none;
+            animation: celebration 2s ease-in-out;
+        }
+        
+        .reset-btn, .mode-btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .reset-btn:hover, .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5em;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .star {
+                font-size: 1.5em;
+            }
+            
+            .progress-display {
+                gap: 10px;
+            }
+            
+            .progress-star {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            50% { opacity: 0.8; text-shadow: 2px 2px 20px rgba(255,255,255,0.5); }
+        }
+        
+        @keyframes starFloat {
+            0%, 100% { transform: translateY(0px); }
+            33% { transform: translateY(-5px); }
+            66% { transform: translateY(-2px); }
+        }
+        
+        @keyframes starPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(74, 144, 226, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(74, 144, 226, 0.6); }
+        }
+        
+        @keyframes backgroundTwinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes identified {
+            0% { transform: scale(1); }
+            50% { transform: scale(2); }
+            100% { transform: scale(1.2); }
+        }
+        
+        @keyframes correctStar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.8); }
+            100% { transform: scale(1.3); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes progressComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes successGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 184, 148, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 184, 148, 0.6); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.05) rotate(-1deg); }
+            75% { transform: scale(1.05) rotate(1deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">⭐ Star Identification ⭐</h1>
+        
+        <div class="subtitle">
+            Explore the night sky and discover the names and secrets of the stars!
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat stars-found">Stars Found: <span id="stars-found">0</span>/8</div>
+            <div class="stat score">Score: <span id="score">0</span></div>
+        </div>
+        
+        <div class="current-challenge" id="current-challenge">
+            Click on any star to learn about it! ✨
+        </div>
+        
+        <div class="progress-display" id="progress-display">
+            <!-- Progress stars will be generated here -->
+        </div>
+        
+        <div class="night-sky" id="night-sky">
+            <svg class="constellation-lines" id="constellation-lines">
+                <!-- Constellation lines will be drawn here -->
+            </svg>
+            <!-- Stars will be placed here -->
+            <div class="star-info" id="star-info">
+                <div class="star-name" id="star-name"></div>
+                <div class="star-fact" id="star-fact"></div>
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="completion-celebration" id="completion">
+            🌟 Congratulations, Stellar Explorer! 🌟
+            <br>You've identified all the major stars and learned about our amazing night sky!
+        </div>
+        
+        <div class="controls">
+            <button class="reset-btn" onclick="resetGame()">🔄 New Night Sky</button>
+            <button class="mode-btn" onclick="toggleMode()">🎯 Quiz Mode</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStarIndex = 0;
+        let identifiedStars = [];
+        let score = 0;
+        let gameComplete = false;
+        let quizMode = false;
+        let currentQuizStar = null;
+        
+        const stars = [
+            { 
+                id: 'polaris', 
+                name: 'Polaris (North Star)', 
+                symbol: '⭐', 
+                fact: 'The North Star sits almost directly above Earth\'s North Pole, making it appear stationary in the sky. Sailors have used it for navigation for thousands of years!',
+                color: '#fff'
+            },
+            { 
+                id: 'sirius', 
+                name: 'Sirius (Dog Star)', 
+                symbol: '✨', 
+                fact: 'Sirius is the brightest star in the night sky! It\'s actually a binary star system, meaning two stars orbit around each other.',
+                color: '#b3e5fc'
+            },
+            { 
+                id: 'vega', 
+                name: 'Vega', 
+                symbol: '💫', 
+                fact: 'Vega was the northern pole star around 12,000 BCE and will be again around 13,727 CE! It\'s one of the most studied stars in astronomy.',
+                color: '#e1f5fe'
+            },
+            { 
+                id: 'rigel', 
+                name: 'Rigel', 
+                symbol: '🌟', 
+                fact: 'Rigel is a blue supergiant star and one of the most luminous known stars. Despite being farther away, it often appears brighter than Betelgeuse!',
+                color: '#81d4fa'
+            },
+            { 
+                id: 'betelgeuse', 
+                name: 'Betelgeuse', 
+                symbol: '🔥', 
+                fact: 'Betelgeuse is a red supergiant that could explode as a supernova anytime in the next 100,000 years. When it does, it might be visible during the day!',
+                color: '#ffab91'
+            },
+            { 
+                id: 'aldebaran', 
+                name: 'Aldebaran', 
+                symbol: '🌠', 
+                fact: 'Aldebaran is known as the "Eye of the Bull" in the constellation Taurus. It\'s an orange giant star about 65 light-years from Earth.',
+                color: '#ffcc80'
+            },
+            { 
+                id: 'altair', 
+                name: 'Altair', 
+                symbol: '⚡', 
+                fact: 'Altair is one of the closest stars visible to the naked eye, only 16.7 light-years away. It spins so fast that it\'s flattened at the poles!',
+                color: '#fff9c4'
+            },
+            { 
+                id: 'antares', 
+                name: 'Antares', 
+                symbol: '❤️', 
+                fact: 'Antares means "rival of Mars" because of its reddish color. This red supergiant is so large that if it replaced our Sun, it would extend past Mars\' orbit!',
+                color: '#ef5350'
+            }
+        ];
+        
+        const starPositions = [
+            { top: '15%', left: '20%' },
+            { top: '25%', left: '70%' },
+            { top: '35%', left: '30%' },
+            { top: '20%', left: '85%' },
+            { top: '45%', left: '15%' },
+            { top: '55%', left: '60%' },
+            { top: '40%', left: '75%' },
+            { top: '60%', left: '25%' }
+        ];
+        
+        const encouragementMessages = [
+            "Stellar discovery! 🌟",
+            "You're a natural astronomer! ⭐",
+            "Amazing star knowledge! ✨",
+            "Brilliant stargazing! 💫",
+            "Fantastic celestial discovery! 🌠"
+        ];
+        
+        const quizPrompts = [
+            "Find the brightest star in the night sky!",
+            "Click on the North Star that guides sailors!",
+            "Locate the red supergiant that could explode!",
+            "Find the star known as the Eye of the Bull!",
+            "Click on the blue supergiant in Orion!",
+            "Find the star that spins incredibly fast!",
+            "Locate the rival of Mars!",
+            "Click on the future northern pole star!"
+        ];
+        
+        function resetGame() {
+            currentStarIndex = 0;
+            identifiedStars = [];
+            score = 0;
+            gameComplete = false;
+            quizMode = false;
+            currentQuizStar = null;
+            
+            setupGame();
+            updateDisplay();
+        }
+        
+        function setupGame() {
+            const sky = document.getElementById('night-sky');
+            // Keep existing SVG and star-info elements
+            const existingElements = sky.querySelectorAll('.constellation-lines, .star-info');
+            sky.innerHTML = '';
+            existingElements.forEach(el => sky.appendChild(el));
+            
+            // Create stars
+            stars.forEach((star, index) => {
+                const element = document.createElement('div');
+                element.className = 'star';
+                element.id = star.id;
+                element.innerHTML = star.symbol;
+                element.style.top = starPositions[index].top;
+                element.style.left = starPositions[index].left;
+                element.style.color = star.color;
+                element.onclick = () => handleStarClick(star, element);
+                
+                sky.appendChild(element);
+            });
+            
+            setupProgressDisplay();
+            hideStarInfo();
+        }
+        
+        function setupProgressDisplay() {
+            const display = document.getElementById('progress-display');
+            display.innerHTML = '';
+            
+            stars.forEach((star, index) => {
+                const element = document.createElement('div');
+                element.className = 'progress-star';
+                element.innerHTML = star.symbol;
+                element.id = `progress-${index}`;
+                element.style.color = star.color;
+                display.appendChild(element);
+            });
+        }
+        
+        function handleStarClick(star, element) {
+            if (gameComplete) return;
+            
+            if (!quizMode) {
+                // Free exploration mode
+                if (!identifiedStars.includes(star.id)) {
+                    identifiedStar(star, element);
+                }
+                showStarInfo(star, element);
+            } else {
+                // Quiz mode
+                if (currentQuizStar && star.id === currentQuizStar.id) {
+                    // Correct star in quiz
+                    element.classList.add('correct');
+                    setTimeout(() => {
+                        element.classList.remove('correct');
+                    }, 1000);
+                    
+                    if (!identifiedStars.includes(star.id)) {
+                        identifiedStar(star, element);
+                    }
+                    
+                    showSuccessFeedback("Perfect! " + star.name + " ⭐");
+                    nextQuizQuestion();
+                } else {
+                    // Wrong star in quiz
+                    element.classList.add('incorrect');
+                    setTimeout(() => {
+                        element.classList.remove('incorrect');
+                    }, 500);
+                    
+                    showErrorFeedback("Not quite! Try again! 🤔");
+                }
+            }
+        }
+        
+        function identifiedStar(star, element) {
+            element.classList.add('identified');
+            identifiedStars.push(star.id);
+            score += 100;
+            
+            // Update progress display
+            const progressIndex = stars.findIndex(s => s.id === star.id);
+            document.getElementById(`progress-${progressIndex}`).classList.add('found');
+            
+            updateDisplay();
+            
+            if (identifiedStars.length === stars.length) {
+                setTimeout(() => completeGame(), 1000);
+            }
+        }
+        
+        function showStarInfo(star, element) {
+            const info = document.getElementById('star-info');
+            const name = document.getElementById('star-name');
+            const fact = document.getElementById('star-fact');
+            
+            name.textContent = star.name;
+            fact.textContent = star.fact;
+            
+            const rect = element.getBoundingClientRect();
+            const container = document.getElementById('night-sky').getBoundingClientRect();
+            
+            info.style.left = Math.min(rect.left - container.left + 50, container.width - 320) + 'px';
+            info.style.top = Math.max(rect.top - container.top - 50, 10) + 'px';
+            info.classList.add('visible');
+            
+            // Hide info after 5 seconds
+            setTimeout(() => {
+                hideStarInfo();
+            }, 5000);
+        }
+        
+        function hideStarInfo() {
+            const info = document.getElementById('star-info');
+            info.classList.remove('visible');
+        }
+        
+        function toggleMode() {
+            quizMode = !quizMode;
+            const modeBtn = document.querySelector('.mode-btn');
+            
+            if (quizMode) {
+                modeBtn.textContent = '🔍 Explore Mode';
+                startQuizMode();
+            } else {
+                modeBtn.textContent = '🎯 Quiz Mode';
+                endQuizMode();
+            }
+        }
+        
+        function startQuizMode() {
+            hideStarInfo();
+            nextQuizQuestion();
+        }
+        
+        function endQuizMode() {
+            currentQuizStar = null;
+            document.getElementById('current-challenge').textContent = 'Click on any star to learn about it! ✨';
+        }
+        
+        function nextQuizQuestion() {
+            if (identifiedStars.length === stars.length) {
+                endQuizMode();
+                return;
+            }
+            
+            // Pick a random unidentified star
+            const unidentified = stars.filter(s => !identifiedStars.includes(s.id));
+            if (unidentified.length === 0) {
+                endQuizMode();
+                return;
+            }
+            
+            currentQuizStar = unidentified[Math.floor(Math.random() * unidentified.length)];
+            const challenge = document.getElementById('current-challenge');
+            
+            // Use specific prompts for known stars, or generic prompt
+            const starIndex = stars.findIndex(s => s.id === currentQuizStar.id);
+            const prompt = quizPrompts[starIndex] || `Find ${currentQuizStar.name}!`;
+            
+            challenge.textContent = prompt + ' 🎯';
+        }
+        
+        function showSuccessFeedback(message) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message || encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+            feedback.className = 'feedback success';
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2000);
+        }
+        
+        function showErrorFeedback(message) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message || "Try another star! 🤔";
+            feedback.className = 'feedback error';
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2000);
+        }
+        
+        function updateDisplay() {
+            document.getElementById('stars-found').textContent = identifiedStars.length;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function completeGame() {
+            gameComplete = true;
+            quizMode = false;
+            currentQuizStar = null;
+            
+            document.getElementById('completion').style.display = 'block';
+            document.getElementById('current-challenge').textContent = '🎉 All stars discovered! You\'re a stellar astronomer! 🎉';
+            
+            // Update mode button
+            document.querySelector('.mode-btn').textContent = '🎯 Quiz Mode';
+        }
+        
+        // Close star info when clicking outside
+        document.getElementById('night-sky').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('star')) {
+                hideStarInfo();
+            }
+        });
+        
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', function() {
+            resetGame();
+        });
+    </script>
+</body>
+</html>

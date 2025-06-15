@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texture Matching Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f8ff, #cce7ff);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .click-instruction {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 20px 30px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .target-texture-container {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #3498db;
+        }
+        
+        .target-label {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .target-texture {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 15px;
+            border: 4px solid #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .texture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .texture-card {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            border: 4px solid #bdc3c7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .texture-card:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-color: #3498db;
+        }
+        
+        .texture-visual {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .texture-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .texture-card.correct {
+            animation: correctBounce 0.8s ease-in-out;
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+        
+        .texture-card.incorrect {
+            animation: errorShake 0.6s ease-in-out;
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+        
+        .texture-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2em;
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 20px 50px;
+            font-size: 1.6em;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
+        }
+        
+        /* Texture Styles */
+        .rough {
+            background: 
+                radial-gradient(circle at 20% 20%, #8b4513 2px, transparent 2px),
+                radial-gradient(circle at 80% 40%, #654321 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, #a0522d 1.5px, transparent 1.5px),
+                #d2691e;
+            background-size: 15px 15px, 10px 10px, 12px 12px;
+        }
+        
+        .smooth {
+            background: linear-gradient(45deg, #87ceeb, #4682b4);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.3);
+        }
+        
+        .bumpy {
+            background: 
+                radial-gradient(circle at 25% 25%, #32cd32 3px, transparent 3px),
+                radial-gradient(circle at 75% 75%, #228b22 4px, transparent 4px),
+                radial-gradient(circle at 50% 50%, #90ee90 2px, transparent 2px),
+                #98fb98;
+            background-size: 20px 20px, 25px 25px, 15px 15px;
+        }
+        
+        .soft {
+            background: radial-gradient(ellipse at center, #ffb6c1, #ffc0cb, #ff69b4);
+            box-shadow: inset 0 0 30px rgba(255,255,255,0.5);
+        }
+        
+        .fuzzy {
+            background: 
+                linear-gradient(45deg, #dda0dd 25%, transparent 25%),
+                linear-gradient(-45deg, #dda0dd 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #dda0dd 75%),
+                linear-gradient(-45deg, transparent 75%, #dda0dd 75%),
+                #e6e6fa;
+            background-size: 8px 8px;
+            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+        }
+        
+        .striped {
+            background: linear-gradient(45deg, #ff6347 25%, #fff 25%, #fff 50%, #ff6347 50%, #ff6347 75%, #fff 75%);
+            background-size: 20px 20px;
+        }
+        
+        .dotted {
+            background: 
+                radial-gradient(circle at 50% 50%, #ff4500 3px, transparent 3px);
+            background-size: 25px 25px;
+            background-color: #ffd700;
+        }
+        
+        .wavy {
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    #40e0d0,
+                    #40e0d0 10px,
+                    #20b2aa 10px,
+                    #20b2aa 20px
+                );
+        }
+        
+        @media (max-width: 768px) {
+            .texture-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .texture-card {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .texture-visual {
+                width: 80px;
+                height: 80px;
+                font-size: 2em;
+            }
+            
+            .target-texture {
+                width: 120px;
+                height: 120px;
+                font-size: 3em;
+            }
+            
+            .score-level-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes correctBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🎨 Texture Matching Game ✋</h1>
+        
+        <div class="instructions">
+            Look at the target texture and find the matching one below!
+        </div>
+        
+        <div class="click-instruction">
+            👆 Click on the texture that looks the SAME as the target!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="target-texture-container">
+            <div class="target-label">Find this texture:</div>
+            <div class="target-texture" id="target-texture">
+                <div class="texture-visual" id="target-visual"></div>
+            </div>
+            <div id="target-name" style="font-size: 1.5em; font-weight: bold; margin-top: 15px; color: #2c3e50;"></div>
+        </div>
+        
+        <div class="texture-grid" id="texture-grid">
+            <!-- Texture cards will be generated here -->
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Round ➡️</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let gameComplete = false;
+        let targetTexture = null;
+        
+        const textures = [
+            { 
+                name: 'Rough', 
+                class: 'rough', 
+                emoji: '🪨',
+                description: 'Bumpy and uneven like a rock'
+            },
+            { 
+                name: 'Smooth', 
+                class: 'smooth', 
+                emoji: '🧊',
+                description: 'Flat and even like ice'
+            },
+            { 
+                name: 'Bumpy', 
+                class: 'bumpy', 
+                emoji: '🥦',
+                description: 'Full of small bumps like broccoli'
+            },
+            { 
+                name: 'Soft', 
+                class: 'soft', 
+                emoji: '🌸',
+                description: 'Gentle and fluffy like a flower'
+            },
+            { 
+                name: 'Fuzzy', 
+                class: 'fuzzy', 
+                emoji: '🧸',
+                description: 'Fluffy and hairy like a teddy bear'
+            },
+            { 
+                name: 'Striped', 
+                class: 'striped', 
+                emoji: '🦓',
+                description: 'Lines like a zebra'
+            },
+            { 
+                name: 'Dotted', 
+                class: 'dotted', 
+                emoji: '🔴',
+                description: 'Full of dots like polka dots'
+            },
+            { 
+                name: 'Wavy', 
+                class: 'wavy', 
+                emoji: '🌊',
+                description: 'Flowing like ocean waves'
+            }
+        ];
+        
+        const successMessages = [
+            "🎉 Perfect match! You found the same texture! 🎉",
+            "⭐ Excellent! Great texture matching! ⭐",
+            "🌟 Amazing! You have sharp eyes! 🌟",
+            "🚀 Fantastic! Perfect texture recognition! 🚀",
+            "🏆 Outstanding! You're a texture expert! 🏆"
+        ];
+        
+        const errorMessages = [
+            "🤔 Not quite! Look at the patterns more carefully! 🔍",
+            "💭 Good try! Compare the textures closely! 👀",
+            "📚 Keep learning! Feel the difference! 📚",
+            "🎯 Almost! Look at how they feel different! ✋",
+            "💡 Try again! Touch and compare! 🤏"
+        ];
+        
+        const completionMessages = [
+            "🎊 Amazing! You're great at matching textures! 🎊",
+            "🌟 Perfect! You understand textures! 🌟",
+            "🎉 Fantastic work! Great job! 🎉",
+            "🚀 Incredible! You're a texture master! 🚀",
+            "⭐ Outstanding! Well done! ⭐"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function setupGame() {
+            gameComplete = false;
+            
+            // Select target texture
+            targetTexture = getRandomItem(textures);
+            
+            // Create options (target + 3 random others)
+            const otherTextures = textures.filter(t => t.name !== targetTexture.name);
+            const randomOthers = shuffleArray(otherTextures).slice(0, 3);
+            const allOptions = shuffleArray([targetTexture, ...randomOthers]);
+            
+            // Display target
+            displayTarget();
+            
+            // Display options
+            displayOptions(allOptions);
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+        }
+        
+        function displayTarget() {
+            const targetVisual = document.getElementById('target-visual');
+            const targetName = document.getElementById('target-name');
+            
+            targetVisual.className = `texture-visual ${targetTexture.class}`;
+            targetVisual.textContent = targetTexture.emoji;
+            targetName.textContent = targetTexture.name;
+        }
+        
+        function displayOptions(options) {
+            const grid = document.getElementById('texture-grid');
+            grid.innerHTML = '';
+            
+            options.forEach((texture, index) => {
+                const card = document.createElement('div');
+                card.className = 'texture-card';
+                card.onclick = () => handleTextureClick(texture, card);
+                
+                const visual = document.createElement('div');
+                visual.className = `texture-visual ${texture.class}`;
+                visual.textContent = texture.emoji;
+                
+                const name = document.createElement('div');
+                name.className = 'texture-name';
+                name.textContent = texture.name;
+                
+                card.appendChild(visual);
+                card.appendChild(name);
+                grid.appendChild(card);
+            });
+        }
+        
+        function handleTextureClick(selectedTexture, clickedCard) {
+            if (gameComplete) return;
+            
+            const feedback = document.getElementById('feedback');
+            const allCards = document.querySelectorAll('.texture-card');
+            
+            // Disable all cards
+            allCards.forEach(card => card.classList.add('disabled'));
+            
+            const isCorrect = selectedTexture.name === targetTexture.name;
+            
+            if (isCorrect) {
+                // Correct answer
+                score += 10;
+                clickedCard.classList.add('correct');
+                
+                const message = getRandomItem(successMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback success';
+                
+                setTimeout(() => {
+                    gameComplete = true;
+                    const celebration = document.getElementById('celebration');
+                    const completionMsg = getRandomItem(completionMessages);
+                    
+                    celebration.textContent = completionMsg;
+                    celebration.classList.add('show');
+                    
+                    document.getElementById('next-btn').classList.add('show');
+                }, 1000);
+                
+            } else {
+                // Wrong answer
+                clickedCard.classList.add('incorrect');
+                
+                const message = getRandomItem(errorMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback error';
+                
+                // Show correct answer
+                setTimeout(() => {
+                    allCards.forEach(card => {
+                        const cardName = card.querySelector('.texture-name').textContent;
+                        if (cardName === targetTexture.name) {
+                            card.classList.add('correct');
+                            card.classList.remove('disabled');
+                        }
+                    });
+                    
+                    feedback.textContent = `The correct texture was: ${targetTexture.name}! ${targetTexture.description}`;
+                    
+                    setTimeout(() => {
+                        gameComplete = true;
+                        document.getElementById('next-btn').classList.add('show');
+                    }, 2000);
+                }, 1000);
+            }
+            
+            updateScore();
+        }
+        
+        function nextLevel() {
+            level++;
+            updateLevel();
+            setupGame();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        // Initialize game
+        updateScore();
+        updateLevel();
+        setupGame();
+    </script>
+</body>
+</html>

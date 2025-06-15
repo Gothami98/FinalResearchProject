@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Kider - Preschool Website Template</title>
+    <title>PathBloomers - Make A Brighter Future For Child</title>
   
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="img/favicon.png" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,7 @@
 
         <!-- Navbar Start -->
         <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-4 px-lg-5 py-lg-0">
-            <a href="index.html" class="navbar-brand">
+            <a href="index.php" class="navbar-brand">
                 <h1 class="m-0 text-primary"><i class="fa fa-book-reader me-3"></i>PathBloomers</h1>
             </a>
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -50,8 +50,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    <a href="index.html" class="nav-item nav-link active">Home</a>
-                    <a href="about.html" class="nav-item nav-link">About Us</a>
+                    <a href="index.php" class="nav-item nav-link active">Home</a>
+                    <a href="about.php" class="nav-item nav-link">About Us</a>
                     <!-- <a href="classes.html" class="nav-item nav-link">Classes</a> -->
                     <!-- <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -92,8 +92,8 @@
                                 <div class="col-10 col-lg-8">
                                     <h1 class="display-2 text-white animated slideInDown mb-4">The Best Kindergarten School For Your Child</h1>
                                     <p class="fs-5 fw-medium text-white mb-4 pb-2">Our kindergarten offers a supportive space for children with special needs to learn and grow. We focus on personalized care and interactive learning.</p>
-                                    <a href="" class="btn btn-primary rounded-pill py-sm-3 px-sm-5 me-3 animated slideInLeft">Get Started</a>
-                                    <a href="" class="btn btn-dark rounded-pill py-sm-3 px-sm-5 animated slideInRight">Learn More</a>
+                                    <a href="fontpage.php" class="btn btn-primary rounded-pill py-sm-3 px-sm-5 me-3 animated slideInLeft">Get Started</a>
+                                    <a href="about.php" class="btn btn-dark rounded-pill py-sm-3 px-sm-5 animated slideInRight">Learn More</a>
                                 </div>
                             </div>
                         </div>
@@ -107,8 +107,8 @@
                                 <div class="col-10 col-lg-8">
                                     <h1 class="display-2 text-white animated slideInDown mb-4">Make A Brighter Future For Your Child</h1>
                                     <p class="fs-5 fw-medium text-white mb-4 pb-2">With fun activities and adaptive teaching, we help build confidence, creativity, and social skills in every child</p>
-                                    <a href="" class="btn btn-primary rounded-pill py-sm-3 px-sm-5 me-3 animated slideInLeft">Get Started</a>
-                                    <a href="" class="btn btn-dark rounded-pill py-sm-3 px-sm-5 animated slideInRight">Learn More</a>
+                                    <a href="fontpage.php" class="btn btn-primary rounded-pill py-sm-3 px-sm-5 me-3 animated slideInLeft">Get Started</a>
+                                    <a href="about.php" class="btn btn-dark rounded-pill py-sm-3 px-sm-5 animated slideInRight">Learn More</a>
                                 </div>
                             </div>
                         </div>
@@ -226,91 +226,6 @@
     </div>
 </div>
 <!-- About End -->
-
-
-<!-- How It Works Start -->
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="bg-light rounded">
-            <div class="row g-0">
-                <!-- Image Collage (Now Aligned) -->
-                <div class="col-lg-6 wow fadeIn d-flex align-items-center" data-wow-delay="0.1s">
-                    <img class="img-fluid w-100 rounded" src="img/classes-4.jpg" alt="" >
-
-                    <!-- <div class="row g-3">
-                        <div class="col-6">
-                            <img class="img-fluid w-100 rounded" src="img/classes-1.jpg" alt="" style="object-fit: cover; height: 250px;">
-                        </div>
-                        <div class="col-6">
-                            <img class="img-fluid w-100 rounded" src="img/classes-2.jpg" alt="" style="object-fit: cover; height: 250px;">
-                        </div>
-                        <div class="col-12">
-                            <img class="img-fluid w-100 rounded" src="img/classes-3.jpg" alt="" style="object-fit: cover; height: 250px;">
-                        </div>
-                    </div> -->
-                </div>
-
-                <!-- Timeline Section -->
-                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
-                    <div class="h-100 d-flex flex-column justify-content-center p-5">
-                        <h1 class="mb-4">How It Works</h1>
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-icon bg-primary text-white">
-                                    <i class="fa fa-user-plus"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Step 1: Register</h4>
-                                    <p>Sign up as a parent, teacher, or admin to access the platform.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-icon bg-success text-white">
-                                    <i class="fa fa-child"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Step 2: Create Child Profile</h4>
-                                    <p>Add child details to personalize the learning experience.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-icon bg-warning text-white">
-                                    <i class="fa fa-book"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Step 3: Select Activities</h4>
-                                    <p>Choose activity-based learning modules designed for cognitive growth.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-icon bg-danger text-white">
-                                    <i class="fa fa-chart-line"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Step 4: Track Progress</h4>
-                                    <p>Monitor the child's learning and development with detailed reports.</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-icon bg-info text-white">
-                                    <i class="fa fa-file-pdf"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Step 5: Generate Reports</h4>
-                                    <p>Download progress reports in PDF format for review.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary py-3 px-5 mt-4" href="">Get Started Now <i class="fa fa-arrow-right ms-2"></i></a>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-</div>
-<!-- How It Works End -->
-
 
 
 

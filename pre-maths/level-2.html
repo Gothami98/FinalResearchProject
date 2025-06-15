@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Sorting Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 1.8em;
+            color: #e74c3c;
+            margin-bottom: 30px;
+            font-weight: bold;
+            background: #fff5f5;
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid #e74c3c;
+        }
+        
+        .sorting-table {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .size-category {
+            background: #f8f9fa;
+            border: 4px dashed #6c757d;
+            border-radius: 20px;
+            padding: 25px;
+            min-height: 300px;
+            width: 350px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .size-category.large {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .size-category.small {
+            border-color: #007bff;
+            background: #cce5ff;
+        }
+        
+        .size-category.drag-over {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .size-category.large.drag-over {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .size-category.small.drag-over {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .category-header {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .category-description {
+            font-size: 1.3em;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .category-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            min-height: 150px;
+        }
+        
+        .objects-area {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .objects-title {
+            text-align: center;
+            font-size: 1.8em;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .objects-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+        
+        .object {
+            cursor: grab;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 4px solid #2c3e50;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            border-radius: 15px;
+        }
+        
+        .object.large-size {
+            width: 120px;
+            height: 120px;
+            font-size: 4em;
+        }
+        
+        .object.small-size {
+            width: 70px;
+            height: 70px;
+            font-size: 2.5em;
+        }
+        
+        .object:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+        
+        .object:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        
+        .object.dragging {
+            opacity: 0.6;
+            transform: rotate(5deg) scale(1.1);
+            z-index: 1000;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 1.6em;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+        }
+        
+        .reset-btn {
+            display: block;
+            margin: 25px auto;
+            padding: 18px 40px;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .sorting-table {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .size-category {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .objects-container {
+                gap: 15px;
+            }
+            
+            .object.large-size {
+                width: 100px;
+                height: 100px;
+                font-size: 3.5em;
+            }
+            
+            .object.small-size {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .object.placed {
+            animation: bounce 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">📏 Sort by Size! 📐</h1>
+        
+        <div class="score">Score: <span id="score">0</span> points</div>
+        
+        <div class="sorting-table">
+            <div class="size-category large" data-size="large">
+                <div class="category-header">🔵 LARGE</div>
+                <div class="category-description">Drop big objects here!</div>
+                <div class="category-items" id="large-items"></div>
+            </div>
+            
+            <div class="size-category small" data-size="small">
+                <div class="category-header">🔴 SMALL</div>
+                <div class="category-description">Drop small objects here!</div>
+                <div class="category-items" id="small-items"></div>
+            </div>
+        </div>
+        
+        <div class="objects-area">
+            <h3 class="objects-title">🎯 Drag and drop objects to sort them by size!</h3>
+            <div class="objects-container" id="objects-container">
+                <!-- Objects will be dynamically added here -->
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <button class="reset-btn" onclick="resetGame()">🔄 New Game</button>
+    </div>
+
+    <script>
+        const colors = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+            '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd', 
+            '#00d2d3', '#ff9f43', '#10ac84', '#ee5a6f',
+            '#ff7675', '#74b9ff', '#a29bfe', '#fd79a8'
+        ];
+        
+        const emojis = [
+            '⚽', '🏀', '🎾', '🏈', '🎱', '🏐',
+            '🍎', '🍊', '🍌', '🍇', '🍓', '🥝',
+            '⭐', '❤️', '💎', '🔥', '⚡', '🌟',
+            '🎈', '🎁', '🎀', '🧸', '🚗', '🚙'
+        ];
+        
+        function getRandomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        function getRandomEmoji() {
+            return emojis[Math.floor(Math.random() * emojis.length)];
+        }
+        
+        let currentObjects = [];
+        let score = 0;
+        
+        function createRandomObjects() {
+            const objects = [];
+            const numObjects = 8 + Math.floor(Math.random() * 4); // 8-11 objects
+            
+            for (let i = 0; i < numObjects; i++) {
+                const isLarge = Math.random() > 0.5;
+                objects.push({
+                    id: i,
+                    size: isLarge ? 'large' : 'small',
+                    color: getRandomColor(),
+                    emoji: getRandomEmoji()
+                });
+            }
+            
+            return shuffleArray(objects);
+        }
+        
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        function createObjectElement(obj) {
+            const div = document.createElement('div');
+            div.className = `object ${obj.size}-size`;
+            div.draggable = true;
+            div.dataset.size = obj.size;
+            div.dataset.id = obj.id;
+            div.style.backgroundColor = obj.color;
+            div.textContent = obj.emoji;
+            
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+            
+            return div;
+        }
+        
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.target.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function setupCategories() {
+            const categories = document.querySelectorAll('.size-category');
+            
+            categories.forEach(category => {
+                category.addEventListener('dragover', handleDragOver);
+                category.addEventListener('drop', handleDrop);
+                category.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const objectId = e.dataTransfer.getData('text/plain');
+            const obj = currentObjects.find(o => o.id == objectId);
+            const categorySize = e.currentTarget.dataset.size;
+            
+            const objectElement = document.querySelector(`[data-id="${objectId}"]`);
+            
+            if (!objectElement || !obj) return;
+            
+            // Always allow the drop and add to category
+            const categoryItems = e.currentTarget.querySelector('.category-items');
+            categoryItems.appendChild(objectElement);
+            objectElement.draggable = false;
+            objectElement.style.cursor = 'default';
+            objectElement.classList.add('placed');
+            
+            // Calculate score based on correct placement
+            if (obj.size === categorySize) {
+                score += 10;
+                showFeedback(`Perfect! That's a ${obj.size} object! ✨`, 'success');
+            } else {
+                score += 5; // Still give some points for participation
+                showFeedback(`Good try! That was actually a ${obj.size} object, but you get points for trying! 🌟`, 'error');
+            }
+            
+            updateScore();
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                objectElement.classList.remove('placed');
+            }, 600);
+            
+            checkGameComplete();
+        }
+        
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 3000);
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function checkGameComplete() {
+            const objectsInContainer = document.querySelectorAll('#objects-container .object').length;
+            
+            if (objectsInContainer === 0) {
+                setTimeout(() => {
+                    showFeedback(`🎉 Amazing! You sorted all objects! Final Score: ${score} points!`, 'success');
+                }, 500);
+            }
+        }
+        
+        function resetGame() {
+            // Clear categories
+            document.getElementById('large-items').innerHTML = '';
+            document.getElementById('small-items').innerHTML = '';
+            
+            // Clear objects container
+            document.getElementById('objects-container').innerHTML = '';
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Create new random objects
+            currentObjects = createRandomObjects();
+            
+            // Create new object elements
+            const container = document.getElementById('objects-container');
+            currentObjects.forEach(obj => {
+                const element = createObjectElement(obj);
+                container.appendChild(element);
+            });
+            
+            // Reset score for new game
+            score = 0;
+            updateScore();
+        }
+        
+        // Initialize game
+        setupCategories();
+        resetGame();
+    </script>
+</body>
+</html>

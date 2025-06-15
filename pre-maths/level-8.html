@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Balance Scale Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f8ff, #cce7ff);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .click-instruction {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 20px 30px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .balance-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .balance-stand {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 200px;
+            background: linear-gradient(135deg, #8b4513, #654321);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .balance-arm {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 12px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 6px;
+            transform-origin: center center;
+            transition: transform 1s ease-in-out;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .balance-center {
+            position: absolute;
+            top: 145px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #e74c3c;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .balance-plate {
+            position: absolute;
+            top: 100px;
+            width: 200px;
+            height: 80px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-radius: 15px;
+            border: 4px solid #d35400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform-origin: center bottom;
+        }
+        
+        .balance-plate:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            border-color: #3498db;
+        }
+        
+        .balance-plate.clicked {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .balance-plate.correct {
+            animation: correctPulse 0.8s ease-in-out;
+            border-color: #28a745;
+            box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+        }
+        
+        .balance-plate.incorrect {
+            animation: errorShake 0.6s ease-in-out;
+            border-color: #dc3545;
+            box-shadow: 0 0 30px rgba(220, 53, 69, 0.8);
+        }
+        
+        .left-plate {
+            left: 50px;
+        }
+        
+        .right-plate {
+            right: 50px;
+        }
+        
+        .plate-objects {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 5px;
+        }
+        
+        .plate-object {
+            font-size: 2.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            animation: float 2s ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+        
+        .apple-count {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2em;
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 20px 50px;
+            font-size: 1.6em;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .balance-arm {
+                width: 400px;
+            }
+            
+            .balance-plate {
+                width: 150px;
+                height: 70px;
+            }
+            
+            .left-plate {
+                left: 25px;
+            }
+            
+            .right-plate {
+                right: 25px;
+            }
+            
+            .plate-object {
+                font-size: 1.8em;
+            }
+            
+            .score-level-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(40, 167, 69, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🍎 Apple Balance Game ⚖️</h1>
+        
+        <div class="instructions">
+            Count the apples on each side! Click on the side with MORE apples!
+        </div>
+        
+        <div class="click-instruction">
+            👆 Click on the side that has MORE apples!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="question" id="question">Which side has more apples?</div>
+        
+        <div class="balance-container">
+            <div class="balance-stand"></div>
+            <div class="balance-arm" id="balance-arm"></div>
+            <div class="balance-center"></div>
+            
+            <div class="balance-plate left-plate" id="left-plate" onclick="handlePlateClick('left')">
+                <div class="plate-objects" id="left-objects"></div>
+                <div class="apple-count" id="left-count"></div>
+            </div>
+            
+            <div class="balance-plate right-plate" id="right-plate" onclick="handlePlateClick('right')">
+                <div class="plate-objects" id="right-objects"></div>
+                <div class="apple-count" id="right-count"></div>
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Round ➡️</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let gameComplete = false;
+        let leftApples = 0;
+        let rightApples = 0;
+        
+        const successMessages = [
+            "🎉 Perfect! You counted correctly! 🎉",
+            "⭐ Excellent! Great counting! ⭐",
+            "🌟 Amazing! You found more apples! 🌟",
+            "🚀 Fantastic! Perfect counting skills! 🚀",
+            "🏆 Outstanding! You're a counting expert! 🏆"
+        ];
+        
+        const errorMessages = [
+            "🤔 Not quite! Count the apples again! 🔍",
+            "💭 Good try! Which side has MORE apples? 👀",
+            "📚 Keep learning! Count each apple! 📚",
+            "🎯 Almost! Look carefully at both sides! ⚖️",
+            "💡 Try again! Count: 1, 2, 3... 🔢"
+        ];
+        
+        const completionMessages = [
+            "🎊 Amazing! You're great at counting! 🎊",
+            "🌟 Perfect! You understand more and less! 🌟",
+            "🎉 Fantastic work! Great job! 🎉",
+            "🚀 Incredible! You're a counting star! 🚀",
+            "⭐ Outstanding! Well done! ⭐"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        
+        function generateAppleCounts() {
+            // Create different apple counts for variety
+            const combinations = [
+                [2, 3], [1, 4], [3, 5], [2, 5], [1, 3],
+                [4, 6], [3, 6], [2, 4], [1, 2], [5, 7]
+            ];
+            
+            const selected = getRandomItem(combinations);
+            
+            // Randomly assign to left/right
+            if (Math.random() > 0.5) {
+                return { left: selected[0], right: selected[1] };
+            } else {
+                return { left: selected[1], right: selected[0] };
+            }
+        }
+        
+        function setupBalance() {
+            gameComplete = false;
+            
+            // Generate apple counts
+            const appleCounts = generateAppleCounts();
+            leftApples = appleCounts.left;
+            rightApples = appleCounts.right;
+            
+            // Display apples
+            displayApples('left', leftApples);
+            displayApples('right', rightApples);
+            
+            // Animate balance
+            animateBalance();
+            
+            // Update question
+            updateQuestion();
+            
+            // Reset plates
+            document.getElementById('left-plate').classList.remove('clicked', 'correct', 'incorrect');
+            document.getElementById('right-plate').classList.remove('clicked', 'correct', 'incorrect');
+        }
+        
+        function displayApples(side, count) {
+            const objectsContainer = document.getElementById(`${side}-objects`);
+            const countContainer = document.getElementById(`${side}-count`);
+            
+            objectsContainer.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const appleElement = document.createElement('span');
+                appleElement.className = 'plate-object';
+                appleElement.textContent = '🍎';
+                appleElement.style.setProperty('--delay', `${i * 0.2}s`);
+                appleElement.title = `Apple ${i + 1}`;
+                objectsContainer.appendChild(appleElement);
+            }
+            
+            countContainer.textContent = `${count} apple${count !== 1 ? 's' : ''}`;
+        }
+        
+        function animateBalance() {
+            const balanceArm = document.getElementById('balance-arm');
+            const appleDifference = rightApples - leftApples;
+            
+            // Calculate rotation angle (max 20 degrees)
+            const maxAngle = 20;
+            const angle = Math.min(Math.max(appleDifference * 4, -maxAngle), maxAngle);
+            
+            setTimeout(() => {
+                balanceArm.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            }, 500);
+        }
+        
+        function updateQuestion() {
+            const question = document.getElementById('question');
+            const difference = Math.abs(leftApples - rightApples);
+            
+            if (difference === 1) {
+                question.textContent = "Which side has more apples? Look carefully!";
+            } else if (difference >= 2) {
+                question.textContent = "Count the apples! Which side has MORE?";
+            } else {
+                question.textContent = "Which side has more apples?";
+            }
+        }
+        
+        function handlePlateClick(side) {
+            if (gameComplete) return;
+            
+            const leftPlate = document.getElementById('left-plate');
+            const rightPlate = document.getElementById('right-plate');
+            const feedback = document.getElementById('feedback');
+            
+            leftPlate.classList.add('clicked');
+            rightPlate.classList.add('clicked');
+            
+            const isCorrect = (side === 'left' && leftApples > rightApples) || 
+                             (side === 'right' && rightApples > leftApples);
+            
+            if (isCorrect) {
+                // Correct answer
+                score += 10;
+                const clickedPlate = document.getElementById(`${side}-plate`);
+                clickedPlate.classList.add('correct');
+                
+                const message = getRandomItem(successMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback success';
+                
+                setTimeout(() => {
+                    gameComplete = true;
+                    const celebration = document.getElementById('celebration');
+                    const completionMsg = getRandomItem(completionMessages);
+                    
+                    celebration.textContent = completionMsg;
+                    celebration.classList.add('show');
+                    
+                    document.getElementById('next-btn').classList.add('show');
+                }, 1000);
+                
+            } else {
+                // Wrong answer
+                const clickedPlate = document.getElementById(`${side}-plate`);
+                clickedPlate.classList.add('incorrect');
+                
+                const message = getRandomItem(errorMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback error';
+                
+                // Show correct answer
+                setTimeout(() => {
+                    const correctSide = leftApples > rightApples ? 'left' : 'right';
+                    const correctPlate = document.getElementById(`${correctSide}-plate`);
+                    correctPlate.classList.add('correct');
+                    
+                    const correctCount = correctSide === 'left' ? leftApples : rightApples;
+                    const incorrectCount = correctSide === 'left' ? rightApples : leftApples;
+                    
+                    feedback.textContent = `The ${correctSide} side has more! (${correctCount} vs ${incorrectCount} apples)`;
+                    
+                    setTimeout(() => {
+                        gameComplete = true;
+                        document.getElementById('next-btn').classList.add('show');
+                    }, 2000);
+                }, 1000);
+            }
+            
+            updateScore();
+        }
+        
+        function nextLevel() {
+            level++;
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            document.getElementById('balance-arm').style.transform = 'translateX(-50%) rotate(0deg)';
+            
+            updateLevel();
+            setupBalance();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        // Initialize game
+        updateScore();
+        updateLevel();
+        setupBalance();
+    </script>
+</body>
+</html>
