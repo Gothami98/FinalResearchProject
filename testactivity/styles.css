@@ -1,0 +1,175 @@
+/* 
+ * Navigation & Skip Buttons - Common CSS
+ * For educational children's activity pages
+ */
+
+/* Navigation icons container */
+.nav-icons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px;
+    z-index: 100;
+  }
+  
+  /* Common style for all navigation icons */
+  .nav-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  /* Hover effect for navigation icons */
+  .nav-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Active state for navigation icons */
+  .nav-icon:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Icon styling within the navigation buttons */
+  .nav-icon i {
+    font-size: 1.5rem;
+    color: #555;
+  }
+  
+  /* Color for each specific navigation icon */
+  .nav-icon.home i {
+    color: #4caf50;  /* Green */
+  }
+  
+  .nav-icon.setting i {
+    color: #2196f3;  /* Blue */
+  }
+  
+  .nav-icon.back i {
+    color: #ff9800;  /* Orange */
+  }
+  
+  /* Skip button styling */
+  .skip-fixed {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff9800;  /* Orange */
+    color: white;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    font-family: 'Bubblegum Sans', cursive;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+  }
+  
+  /* Hover effect for skip button */
+  .skip-fixed:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f57c00;  /* Darker Orange */
+  }
+  
+  /* Active state for skip button */
+  .skip-fixed:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Icon within skip button */
+  .skip-fixed i {
+    margin-right: 8px;
+  }
+  
+  /* Responsive adjustments for smaller screens */
+  @media (max-width: 600px) {
+    .nav-icons {
+      top: 10px;
+      right: 10px;
+      gap: 10px;
+    }
+    
+    .nav-icon {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .nav-icon i {
+      font-size: 1.2rem;
+    }
+    
+    .skip-fixed {
+      padding: 10px 20px;
+      font-size: 1rem;
+      bottom: 15px;
+      right: 15px;
+    }
+  }
+
+/* Congratulatory Popup Styles */
+.congrats-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 1000;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.congrats-popup h2 {
+    color: #4caf50;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.congrats-popup p {
+    color: #666;
+    margin: 10px 0;
+    font-size: 1.2rem;
+}
+
+.congrats-popup button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.congrats-popup button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+@keyframes popIn {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}

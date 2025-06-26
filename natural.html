@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Nature Walk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 30%, #90EE90 70%, #32CD32 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated clouds */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            opacity: 0.7;
+            animation: cloudFloat 20s linear infinite;
+        }
+        
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+        }
+        
+        .cloud1 {
+            width: 80px;
+            height: 40px;
+            top: 20%;
+            left: -100px;
+            animation-duration: 25s;
+        }
+        
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+        
+        .cloud1:after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+        
+        .cloud2 {
+            width: 60px;
+            height: 30px;
+            top: 10%;
+            left: -80px;
+            animation-duration: 30s;
+            animation-delay: -10s;
+        }
+        
+        .cloud2:before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 8px;
+        }
+        
+        .cloud2:after {
+            width: 45px;
+            height: 30px;
+            top: -10px;
+            right: 8px;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            font-size: 3em;
+            color: #2E8B57;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: titleBounce 3s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            font-size: 1.5em;
+            color: #228B22;
+            margin-bottom: 20px;
+        }
+        
+        .instructions {
+            font-size: 1.2em;
+            color: #2F4F4F;
+            background: linear-gradient(135deg, #E6FFE6, #F0FFF0);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #32CD32;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: statPulse 2s ease-in-out infinite alternate;
+        }
+        
+        .nature-scene {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 40%, #90EE90 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 3px solid #228B22;
+        }
+        
+        /* Sun */
+        .sun {
+            position: absolute;
+            top: 30px;
+            right: 60px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            animation: sunGlow 3s ease-in-out infinite alternate;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+        
+        .sun:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+        
+        /* Nature elements */
+        .nature-element {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            z-index: 3;
+        }
+        
+        .nature-element:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        .nature-element.discovered {
+            animation: discoveredPulse 1s ease-in-out;
+            filter: brightness(1.3) drop-shadow(0 0 10px rgba(0,255,0,0.8));
+        }
+        
+        .tree1 {
+            bottom: 100px;
+            left: 100px;
+            font-size: 6em;
+            animation: treeWave 4s ease-in-out infinite;
+        }
+        
+        .tree2 {
+            bottom: 120px;
+            right: 150px;
+            font-size: 5em;
+            animation: treeWave 3s ease-in-out infinite;
+            animation-delay: -1s;
+        }
+        
+        .bird1 {
+            top: 120px;
+            left: 200px;
+            font-size: 3em;
+            animation: birdFly 6s ease-in-out infinite;
+        }
+        
+        .bird2 {
+            top: 180px;
+            right: 250px;
+            font-size: 2.5em;
+            animation: birdFly 5s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+        
+        .flower1 {
+            bottom: 150px;
+            left: 300px;
+            font-size: 3em;
+            animation: flowerSway 3s ease-in-out infinite;
+        }
+        
+        .flower2 {
+            bottom: 140px;
+            right: 300px;
+            font-size: 3.5em;
+            animation: flowerSway 2.5s ease-in-out infinite;
+            animation-delay: -1s;
+        }
+        
+        .butterfly {
+            top: 250px;
+            left: 400px;
+            font-size: 2.5em;
+            animation: butterflyFloat 4s ease-in-out infinite;
+        }
+        
+        .bee {
+            top: 200px;
+            right: 400px;
+            font-size: 2em;
+            animation: beeZigzag 3s linear infinite;
+        }
+        
+        /* Ground elements */
+        .grass {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, #228B22, #32CD32);
+            z-index: 1;
+        }
+        
+        .grass::before {
+            content: '🌾🌱🌿🌾🌱🌿🌾🌱🌿🌾🌱🌿🌾🌱🌿🌾🌱🌿🌾🌱🌿🌾🌱🌿';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            font-size: 1.5em;
+            animation: grassWave 3s ease-in-out infinite;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid #32CD32;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .info-content {
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .info-content.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .info-title {
+            font-size: 2em;
+            color: #2E8B57;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .info-description {
+            font-size: 1.3em;
+            color: #2F4F4F;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .discovery-counter {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #8B4513;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .nature-scene {
+                height: 400px;
+            }
+            
+            .nature-element {
+                font-size: 0.8em;
+            }
+            
+            .sun {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+        }
+        
+        @keyframes cloudFloat {
+            0% { left: -100px; }
+            100% { left: calc(100% + 100px); }
+        }
+        
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes statPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        
+        @keyframes sunGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.9); }
+        }
+        
+        @keyframes treeWave {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(2deg); }
+        }
+        
+        @keyframes birdFly {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-15px) translateX(10px); }
+            75% { transform: translateY(-5px) translateX(-5px); }
+        }
+        
+        @keyframes flowerSway {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(3deg); }
+        }
+        
+        @keyframes butterflyFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            75% { transform: translateY(-10px) rotate(-3deg); }
+        }
+        
+        @keyframes beeZigzag {
+            0% { transform: translateX(0px) translateY(0px); }
+            25% { transform: translateX(15px) translateY(-10px); }
+            50% { transform: translateX(-10px) translateY(5px); }
+            75% { transform: translateX(20px) translateY(-15px); }
+            100% { transform: translateX(0px) translateY(0px); }
+        }
+        
+        @keyframes grassWave {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(2px); }
+        }
+        
+        @keyframes discoveredPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated clouds -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">🌿 Virtual Nature Walk 🦋</h1>
+            <p class="subtitle">Explore and Discover Nature's Wonders!</p>
+            <div class="instructions">
+                👆 Click on different elements in the scene below to learn about nature! 
+                Discover trees, birds, flowers, and more fascinating creatures and plants.
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                🔍 Discovered: <span id="discovered-count">0</span>/8
+            </div>
+            <div class="stat-box">
+                🏆 Nature Explorer Level: <span id="explorer-level">Beginner</span>
+            </div>
+        </div>
+        
+        <div class="nature-scene">
+            <!-- Sun -->
+            <div class="sun nature-element" data-info="sun">☀️</div>
+            
+            <!-- Trees -->
+            <div class="tree1 nature-element" data-info="tree">🌳</div>
+            <div class="tree2 nature-element" data-info="tree2">🌲</div>
+            
+            <!-- Birds -->
+            <div class="bird1 nature-element" data-info="bird">🐦</div>
+            <div class="bird2 nature-element" data-info="bird2">🦅</div>
+            
+            <!-- Flowers -->
+            <div class="flower1 nature-element" data-info="flower">🌸</div>
+            <div class="flower2 nature-element" data-info="flower2">🌻</div>
+            
+            <!-- Insects -->
+            <div class="butterfly nature-element" data-info="butterfly">🦋</div>
+            <div class="bee nature-element" data-info="bee">🐝</div>
+            
+            <!-- Ground -->
+            <div class="grass"></div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-content" id="info-content">
+                <div class="info-title">Welcome to Your Nature Walk! 🌱</div>
+                <div class="info-description">
+                    Click on any element in the scene above to learn fascinating facts about nature. 
+                    Each discovery will help you become a better nature explorer!
+                </div>
+            </div>
+        </div>
+        
+        <div class="discovery-counter">
+            <span id="progress-text">Start your nature adventure by clicking on the elements above! 🌿</span>
+        </div>
+    </div>
+
+    <script>
+        let discoveredItems = new Set();
+        let totalItems = 8;
+        
+        const natureInfo = {
+            sun: {
+                title: "The Sun ☀️",
+                description: "The sun is a star that gives us light and warmth! It helps plants grow through photosynthesis and provides energy for all life on Earth. The sun is about 93 million miles away from us!"
+            },
+            tree: {
+                title: "Oak Tree 🌳",
+                description: "Trees are amazing! They produce oxygen for us to breathe and provide homes for many animals. This oak tree can live for hundreds of years and its roots spread deep underground to find water."
+            },
+            tree2: {
+                title: "Pine Tree 🌲",
+                description: "Pine trees are evergreen, meaning they stay green all year! They have needle-like leaves and produce pine cones. Many birds and squirrels make their homes in pine trees."
+            },
+            bird: {
+                title: "Songbird 🐦",
+                description: "Birds are wonderful singers! They communicate with each other through different songs and calls. Birds help spread seeds when they eat fruits, helping new plants grow in different places."
+            },
+            bird2: {
+                title: "Eagle 🦅",
+                description: "Eagles are powerful birds of prey with incredibly sharp eyesight! They can see small animals from very high up in the sky. Eagles build large nests called eyries on tall trees or cliffs."
+            },
+            flower: {
+                title: "Cherry Blossom 🌸",
+                description: "Flowers are nature's way of attracting bees and butterflies! The beautiful colors and sweet nectar help plants reproduce. Cherry blossoms bloom in spring and are symbols of renewal and beauty."
+            },
+            flower2: {
+                title: "Sunflower 🌻",
+                description: "Sunflowers are amazing because they actually turn to follow the sun throughout the day! They can grow very tall - some reach over 10 feet! Their seeds provide food for birds and can be made into oil."
+            },
+            butterfly: {
+                title: "Butterfly 🦋",
+                description: "Butterflies start life as caterpillars and transform completely in a process called metamorphosis! They help pollinate flowers as they drink nectar. Their colorful wings are actually made of tiny scales."
+            },
+            bee: {
+                title: "Honeybee 🐝",
+                description: "Bees are super important for our environment! They pollinate plants, which helps produce the fruits and vegetables we eat. A single bee visits about 2,000 flowers per day and bees communicate through special dances!"
+            }
+        };
+        
+        const explorerLevels = [
+            { threshold: 0, level: "Beginner" },
+            { threshold: 2, level: "Explorer" },
+            { threshold: 4, level: "Naturalist" },
+            { threshold: 6, level: "Expert" },
+            { threshold: 8, level: "Nature Master" }
+        ];
+        
+        function updateDiscoveryCount() {
+            document.getElementById('discovered-count').textContent = discoveredItems.size;
+            
+            // Update explorer level
+            const currentLevel = explorerLevels.reverse().find(level => discoveredItems.size >= level.threshold);
+            document.getElementById('explorer-level').textContent = currentLevel.level;
+            explorerLevels.reverse(); // Reset order
+            
+            // Update progress text
+            const progressText = document.getElementById('progress-text');
+            if (discoveredItems.size === 0) {
+                progressText.textContent = "Start your nature adventure by clicking on the elements above! 🌿";
+            } else if (discoveredItems.size < totalItems) {
+                progressText.textContent = `Great exploring! You've discovered ${discoveredItems.size} out of ${totalItems} nature elements. Keep going! 🔍`;
+            } else {
+                progressText.textContent = "🎉 Congratulations! You've discovered all nature elements and become a Nature Master! 🏆";
+                progressText.style.background = "linear-gradient(135deg, #32CD32, #228B22)";
+                progressText.style.color = "white";
+            }
+        }
+        
+        function showInfo(infoKey) {
+            const info = natureInfo[infoKey];
+            const infoContent = document.getElementById('info-content');
+            
+            infoContent.innerHTML = `
+                <div class="info-title">${info.title}</div>
+                <div class="info-description">${info.description}</div>
+            `;
+            
+            infoContent.classList.add('show');
+        }
+        
+        // Add click listeners to all nature elements
+        document.querySelectorAll('.nature-element').forEach(element => {
+            element.addEventListener('click', function() {
+                const infoKey = this.getAttribute('data-info');
+                
+                // Mark as discovered
+                if (!discoveredItems.has(infoKey)) {
+                    discoveredItems.add(infoKey);
+                    this.classList.add('discovered');
+                    updateDiscoveryCount();
+                }
+                
+                // Show information
+                showInfo(infoKey);
+            });
+        });
+        
+        // Initialize
+        updateDiscoveryCount();
+    </script>
+</body>
+</html>

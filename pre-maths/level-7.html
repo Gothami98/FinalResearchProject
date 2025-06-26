@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Color Identification Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f8ff, #cce7ff);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .click-instruction {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 20px 30px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .scene-container {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #dee2e6;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 40px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .objects-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            min-height: 300px;
+            padding: 20px;
+        }
+        
+        .object {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 4px solid transparent;
+            border-radius: 20px;
+            padding: 20px;
+            animation: objectFloat 3s ease-in-out infinite;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            min-width: 180px;
+            min-height: 200px;
+        }
+        
+        .object:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            border-color: #3498db;
+        }
+        
+        .object.clicked {
+            opacity: 0.4;
+            transform: scale(0.9);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .object.correct-click {
+            animation: correctPulse 0.8s ease-in-out;
+            border-color: #28a745;
+            box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+        }
+        
+        .object.incorrect-click {
+            animation: errorShake 0.6s ease-in-out;
+            border-color: #dc3545;
+            box-shadow: 0 0 30px rgba(220, 53, 69, 0.8);
+        }
+        
+        .fruit-emoji {
+            font-size: 6em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .fruit-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2em;
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 20px 50px;
+            font-size: 1.6em;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .objects-area {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .object {
+                min-width: 150px;
+                min-height: 180px;
+            }
+            
+            .fruit-emoji {
+                font-size: 4em;
+            }
+            
+            .score-level-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+        
+        @keyframes objectFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.2); box-shadow: 0 0 30px rgba(40, 167, 69, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🔴 Find the RED Fruit! 🍎</h1>
+        
+        <div class="instructions">
+            Look at the 3 fruits below. Click on the RED colored fruit!
+        </div>
+        
+        <div class="click-instruction">
+            👆 Click on the RED fruit to score points!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="scene-container">
+            <div class="question" id="question">Which fruit is RED?</div>
+            <div class="objects-area" id="objects-area">
+                <!-- Fruits will be generated here -->
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Level ➡️</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let gameComplete = false;
+        
+        const fruits = [
+            { name: 'Apple', emoji: '🍎', isRed: true },
+            { name: 'Orange', emoji: '🍊', isRed: false },
+            { name: 'Pear', emoji: '🍐', isRed: false }
+        ];
+        
+        const successMessages = [
+            "🎉 Perfect! The apple is RED! 🎉",
+            "⭐ Excellent! You found the red fruit! ⭐",
+            "🌟 Great job! Apples are red! 🌟",
+            "🚀 Fantastic! Red like a fire truck! 🚀",
+            "🏆 Amazing! You know your colors! 🏆"
+        ];
+        
+        const errorMessages = [
+            "🤔 Not quite! Try again - look for RED! 🔍",
+            "💭 Good try! Remember, RED is like fire! 👀",
+            "📚 Keep learning! RED is a bright, warm color! 📚",
+            "🎯 Almost! The apple is the red fruit! 🍎",
+            "💡 Try again! RED is the color of roses! 🌹"
+        ];
+        
+        const completionMessages = [
+            "🎊 Amazing! You found the red fruit! 🎊",
+            "🌟 Perfect! You're a color expert! 🌟",
+            "🎉 Fantastic work! Well done! 🎉",
+            "🚀 Incredible! You did it! 🚀",
+            "⭐ Outstanding! Great job! ⭐"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function generateObjects() {
+            const objectsArea = document.getElementById('objects-area');
+            objectsArea.innerHTML = '';
+            
+            gameComplete = false;
+            
+            // Shuffle the fruits for random positioning
+            const shuffledFruits = shuffleArray(fruits);
+            
+            shuffledFruits.forEach((fruit, index) => {
+                const objEl = document.createElement('div');
+                objEl.className = 'object';
+                objEl.id = `fruit-${index}`;
+                objEl.style.animationDelay = (index * 0.2) + 's';
+                
+                objEl.innerHTML = `
+                    <span class="fruit-emoji">${fruit.emoji}</span>
+                    <div class="fruit-name">${fruit.name}</div>
+                `;
+                
+                objEl.onclick = () => handleFruitClick(fruit, objEl);
+                objectsArea.appendChild(objEl);
+            });
+        }
+        
+        function handleFruitClick(fruit, element) {
+            if (gameComplete || element.classList.contains('clicked')) return;
+            
+            element.classList.add('clicked');
+            const feedback = document.getElementById('feedback');
+            
+            if (fruit.isRed) {
+                // Correct answer
+                score += 10;
+                element.classList.add('correct-click');
+                
+                const message = getRandomItem(successMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback success';
+                
+                setTimeout(() => {
+                    gameComplete = true;
+                    const celebration = document.getElementById('celebration');
+                    const completionMsg = getRandomItem(completionMessages);
+                    
+                    celebration.textContent = completionMsg;
+                    celebration.classList.add('show');
+                    
+                    document.getElementById('next-btn').classList.add('show');
+                }, 1000);
+                
+            } else {
+                // Wrong answer
+                element.classList.add('incorrect-click');
+                
+                const message = getRandomItem(errorMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback error';
+                
+                // Allow clicking again after animation
+                setTimeout(() => {
+                    element.classList.remove('incorrect-click', 'clicked');
+                }, 1000);
+            }
+            
+            updateScore();
+        }
+        
+        function nextLevel() {
+            level++;
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            
+            updateLevel();
+            generateObjects();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        // Initialize game
+        updateScore();
+        updateLevel();
+        generateObjects();
+    </script>
+</body>
+</html>

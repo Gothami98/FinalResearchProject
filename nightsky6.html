@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Sky Explorer - Sun, Moon & Stars</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 30, 0.8);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            min-height: 90vh;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3.5em;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.8em;
+            color: #b8c6db;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, rgba(184, 198, 219, 0.2), rgba(255, 255, 255, 0.1));
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid #4a90e2;
+            font-weight: bold;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .objects-found {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .current-challenge {
+            text-align: center;
+            font-size: 2.2em;
+            color: #fff;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 15px;
+            border: 3px solid #4a90e2;
+            font-weight: bold;
+            animation: starPulse 2s ease-in-out infinite;
+        }
+        
+        .night-sky {
+            position: relative;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0c0c1e 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 600px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #ffffff 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, #ffffff 0.5px, transparent 0.5px),
+                radial-gradient(circle at 80% 70%, #ffffff 0.8px, transparent 0.8px),
+                radial-gradient(circle at 30% 80%, #ffffff 0.6px, transparent 0.6px);
+            background-size: 120px 120px, 180px 180px, 200px 200px, 150px 150px;
+            animation: backgroundTwinkle 4s ease-in-out infinite;
+        }
+        
+        .sky-object {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 6em;
+            user-select: none;
+            filter: drop-shadow(0 0 15px currentColor);
+            animation: skyFloat 4s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+        
+        .sky-object:hover {
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 25px currentColor);
+        }
+        
+        .sky-object.identified {
+            animation: identified 1.5s ease-in-out;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+        
+        .sky-object.correct {
+            animation: correctObject 1.5s ease-in-out;
+            filter: drop-shadow(0 0 30px #00b894);
+        }
+        
+        .sky-object.incorrect {
+            animation: shake 0.6s ease-in-out;
+            filter: drop-shadow(0 0 25px #e74c3c);
+        }
+        
+        .sky-object.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(70%);
+        }
+        
+        .sun {
+            background: radial-gradient(circle, #ffd700 0%, #ffb347 100%);
+            color: #ff8c00;
+            animation: sunGlow 3s ease-in-out infinite;
+        }
+        
+        .moon {
+            background: radial-gradient(circle, #f5f5dc 0%, #d3d3d3 100%);
+            color: #708090;
+            animation: moonGlow 4s ease-in-out infinite;
+        }
+        
+        .star {
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            color: #fff;
+        }
+        
+        .object-info {
+            display: none;
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #4a90e2;
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            max-width: 350px;
+            z-index: 100;
+            font-size: 1.3em;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .object-info.visible {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .object-name {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .object-fact {
+            color: #b8c6db;
+            line-height: 1.5;
+            text-align: center;
+        }
+        
+        .progress-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .progress-object {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 30, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-object.found {
+            border-color: #4a90e2;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.4), rgba(118, 75, 162, 0.4));
+            animation: progressComplete 0.8s ease-in-out;
+            transform: scale(1.1);
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2.2em;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.3), rgba(0, 206, 201, 0.3));
+            color: #00b894;
+            border: 3px solid #00b894;
+            animation: successGlow 1.5s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.3), rgba(220, 53, 69, 0.3));
+            color: #e74c3c;
+            border: 3px solid #e74c3c;
+            animation: errorShake 0.6s ease-in-out;
+        }
+        
+        .completion-celebration {
+            text-align: center;
+            font-size: 3em;
+            color: #4a90e2;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 20px;
+            border: 3px solid #4a90e2;
+            display: none;
+            animation: celebration 2s ease-in-out;
+        }
+        
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 40px;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5em;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .sky-object {
+                font-size: 4em;
+                width: 90px;
+                height: 90px;
+            }
+            
+            .progress-display {
+                gap: 15px;
+            }
+            
+            .progress-object {
+                width: 60px;
+                height: 60px;
+                font-size: 2.5em;
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            50% { opacity: 0.8; text-shadow: 2px 2px 20px rgba(255,255,255,0.5); }
+        }
+        
+        @keyframes skyFloat {
+            0%, 100% { transform: translateY(0px); }
+            33% { transform: translateY(-8px); }
+            66% { transform: translateY(-4px); }
+        }
+        
+        @keyframes starPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(74, 144, 226, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(74, 144, 226, 0.6); }
+        }
+        
+        @keyframes backgroundTwinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+        
+        @keyframes sunGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9); }
+        }
+        
+        @keyframes moonGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 245, 220, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(245, 245, 220, 0.7); }
+        }
+        
+        @keyframes identified {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1.1); }
+        }
+        
+        @keyframes correctObject {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.4) rotate(5deg); }
+            50% { transform: scale(1.6) rotate(-5deg); }
+            75% { transform: scale(1.4) rotate(3deg); }
+            100% { transform: scale(1.1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-15px); }
+            40% { transform: translateX(15px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes progressComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.1); }
+        }
+        
+        @keyframes successGlow {
+            0%, 100% { box-shadow: 0 0 25px rgba(0, 184, 148, 0.4); }
+            50% { box-shadow: 0 0 50px rgba(0, 184, 148, 0.8); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.05) rotate(-2deg); }
+            75% { transform: scale(1.05) rotate(2deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🌙 Night Sky Explorer 🌟</h1>
+        
+        <div class="subtitle">
+            Click on the night sky objects to learn about the Sun, Moon, and Stars!
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat objects-found">Objects Found: <span id="objects-found">0</span>/6</div>
+            <div class="stat score">Score: <span id="score">0</span></div>
+        </div>
+        
+        <div class="current-challenge" id="current-challenge">
+            Click on: The bright Sun! ☀️
+        </div>
+        
+        <div class="progress-display" id="progress-display">
+            <!-- Progress objects will be generated here -->
+        </div>
+        
+        <div class="night-sky" id="night-sky">
+            <!-- Sky objects will be placed here -->
+            <div class="object-info" id="object-info">
+                <div class="object-name" id="object-name"></div>
+                <div class="object-fact" id="object-fact"></div>
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="completion-celebration" id="completion">
+            🌟 Amazing Night Sky Explorer! 🌟
+            <br>You've learned about the Sun, Moon, and Stars! 
+            <br>You're ready to explore the real night sky! ✨
+        </div>
+        
+        <button class="reset-btn" onclick="resetGame()">🔄 Explore Again</button>
+    </div>
+
+    <script>
+        let currentObjectIndex = 0;
+        let identifiedObjects = [];
+        let score = 0;
+        let gameComplete = false;
+        
+        const skyObjects = [
+            { 
+                id: 'sun', 
+                name: 'The Sun', 
+                symbol: '☀️', 
+                fact: 'The Sun is our closest star! It gives us light and warmth during the day. It\'s so big that over 1 million Earths could fit inside it!',
+                class: 'sun'
+            },
+            { 
+                id: 'moon', 
+                name: 'The Moon', 
+                symbol: '🌙', 
+                fact: 'The Moon is Earth\'s companion in space! It changes shape in the sky and controls the ocean tides. Astronauts have walked on the Moon!',
+                class: 'moon'
+            },
+            { 
+                id: 'star1', 
+                name: 'Bright Star', 
+                symbol: '⭐', 
+                fact: 'Stars are like distant suns that twinkle in the night sky! They\'re so far away that their light takes years to reach us.',
+                class: 'star'
+            },
+            { 
+                id: 'star2', 
+                name: 'Shining Star', 
+                symbol: '✨', 
+                fact: 'This star shines brightly in the darkness! Stars come in different colors - some are red, some are blue, and some are yellow like our Sun.',
+                class: 'star'
+            },
+            { 
+                id: 'star3', 
+                name: 'Twinkling Star', 
+                symbol: '🌟', 
+                fact: 'Stars seem to twinkle because Earth\'s atmosphere moves their light around! In space, stars don\'t twinkle at all.',
+                class: 'star'
+            },
+            { 
+                id: 'star4', 
+                name: 'Sparkling Star', 
+                symbol: '💫', 
+                fact: 'Ancient people used stars to navigate and tell stories! Each group of stars is called a constellation, like connect-the-dots in the sky.',
+                class: 'star'
+            }
+        ];
+        
+        const objectPositions = [
+            { top: '10%', left: '20%' },
+            { top: '20%', left: '70%' },
+            { top: '40%', left: '15%' },
+            { top: '35%', left: '80%' },
+            { top: '60%', left: '25%' },
+            { top: '55%', left: '65%' }
+        ];
+        
+        const encouragementMessages = [
+            "Fantastic discovery! 🌟",
+            "You're a great sky explorer! ⭐",
+            "Amazing job learning about space! ✨",
+            "Wonderful! You found it! 🎉",
+            "Brilliant sky watching! 💫"
+        ];
+        
+        const errorMessages = [
+            "Not quite! Try the one that's glowing! 😊",
+            "Oops! Look for the object mentioned above! 🤔",
+            "Close! Check what we're looking for! 👆",
+            "Keep trying! You'll find it! 💪"
+        ];
+        
+        function resetGame() {
+            currentObjectIndex = 0;
+            identifiedObjects = [];
+            score = 0;
+            gameComplete = false;
+            
+            setupGame();
+            updateDisplay();
+            hideObjectInfo();
+        }
+        
+        function setupGame() {
+            const sky = document.getElementById('night-sky');
+            // Keep existing object-info element
+            const existingInfo = sky.querySelector('.object-info');
+            sky.innerHTML = '';
+            if (existingInfo) sky.appendChild(existingInfo);
+            
+            // Create sky objects
+            skyObjects.forEach((obj, index) => {
+                const element = document.createElement('div');
+                element.className = `sky-object ${obj.class}`;
+                element.id = obj.id;
+                element.innerHTML = obj.symbol;
+                element.style.top = objectPositions[index].top;
+                element.style.left = objectPositions[index].left;
+                element.onclick = () => handleObjectClick(obj, element);
+                
+                // Disable all except first object initially
+                if (index > 0) {
+                    element.classList.add('disabled');
+                }
+                
+                sky.appendChild(element);
+            });
+            
+            setupProgressDisplay();
+        }
+        
+        function setupProgressDisplay() {
+            const display = document.getElementById('progress-display');
+            display.innerHTML = '';
+            
+            skyObjects.forEach((obj, index) => {
+                const element = document.createElement('div');
+                element.className = 'progress-object';
+                element.innerHTML = obj.symbol;
+                element.id = `progress-${index}`;
+                display.appendChild(element);
+            });
+        }
+        
+        function handleObjectClick(obj, element) {
+            if (gameComplete) return;
+            
+            const expectedObject = skyObjects[currentObjectIndex];
+            
+            if (obj.id === expectedObject.id) {
+                // Correct object clicked
+                element.classList.add('correct');
+                setTimeout(() => {
+                    element.classList.remove('correct');
+                    element.classList.add('identified');
+                }, 1000);
+                
+                // Update progress display
+                document.getElementById(`progress-${currentObjectIndex}`).classList.add('found');
+                
+                identifiedObjects.push(obj);
+                currentObjectIndex++;
+                score += 150;
+                
+                showSuccessFeedback();
+                showObjectInfo(obj, element);
+                
+                // Enable next object or complete game
+                if (currentObjectIndex < skyObjects.length) {
+                    // Enable next object
+                    const nextObject = document.getElementById(skyObjects[currentObjectIndex].id);
+                    nextObject.classList.remove('disabled');
+                    updateDisplay();
+                } else {
+                    // Game complete
+                    setTimeout(() => completeGame(), 2000);
+                }
+                
+            } else {
+                // Wrong object clicked
+                element.classList.add('incorrect');
+                setTimeout(() => {
+                    element.classList.remove('incorrect');
+                }, 600);
+                
+                showErrorFeedback();
+            }
+        }
+        
+        function showObjectInfo(obj, element) {
+            const info = document.getElementById('object-info');
+            const name = document.getElementById('object-name');
+            const fact = document.getElementById('object-fact');
+            
+            name.textContent = obj.name;
+            fact.textContent = obj.fact;
+            
+            const rect = element.getBoundingClientRect();
+            const container = document.getElementById('night-sky').getBoundingClientRect();
+            
+            info.style.left = Math.min(rect.left - container.left + 70, container.width - 370) + 'px';
+            info.style.top = Math.max(rect.top - container.top - 60, 10) + 'px';
+            info.classList.add('visible');
+            
+            // Hide info after 4 seconds
+            setTimeout(() => {
+                hideObjectInfo();
+            }, 4000);
+        }
+        
+        function hideObjectInfo() {
+            const info = document.getElementById('object-info');
+            info.classList.remove('visible');
+        }
+        
+        function showSuccessFeedback() {
+            const feedback = document.getElementById('feedback');
+            const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+            feedback.textContent = message;
+            feedback.className = 'feedback success';
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2500);
+        }
+        
+        function showErrorFeedback() {
+            const feedback = document.getElementById('feedback');
+            const message = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+            feedback.textContent = message;
+            feedback.className = 'feedback error';
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2500);
+        }
+        
+        function updateDisplay() {
+            // Update object counter
+            document.getElementById('objects-found').textContent = identifiedObjects.length;
+            document.getElementById('score').textContent = score;
+            
+            // Update current instruction
+            if (currentObjectIndex < skyObjects.length) {
+                const instruction = document.getElementById('current-challenge');
+                const currentObj = skyObjects[currentObjectIndex];
+                let instructionText = '';
+                
+                switch(currentObj.id) {
+                    case 'sun':
+                        instructionText = 'Click on: The bright Sun! ☀️';
+                        break;
+                    case 'moon':
+                        instructionText = 'Click on: The glowing Moon! 🌙';
+                        break;
+                    case 'star1':
+                        instructionText = 'Click on: A bright star! ⭐';
+                        break;
+                    case 'star2':
+                        instructionText = 'Click on: A shining star! ✨';
+                        break;
+                    case 'star3':
+                        instructionText = 'Click on: A twinkling star! 🌟';
+                        break;
+                    case 'star4':
+                        instructionText = 'Click on: A sparkling star! 💫';
+                        break;
+                }
+                
+                instruction.textContent = instructionText;
+            }
+        }
+        
+        function completeGame() {
+            gameComplete = true;
+            
+            // Show completion
+            document.getElementById('completion').style.display = 'block';
+            
+            // Hide current instruction
+            document.getElementById('current-challenge').textContent = '🎉 You\'ve explored the entire night sky! 🎉';
+        }
+        
+        // Close object info when clicking outside
+        document.getElementById('night-sky').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('sky-object')) {
+                hideObjectInfo();
+            }
+        });
+        
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', function() {
+            resetGame();
+        });
+    </script>
+</body>
+</html>

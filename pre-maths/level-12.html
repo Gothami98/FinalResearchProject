@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Let's Find Out - Exploration Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #a29bfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            color: #2c3e50;
+            min-height: 90vh;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3.5em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid #e67e22;
+            font-weight: bold;
+        }
+        
+        .scene-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .scene-btn {
+            padding: 15px 30px;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .scene-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.4);
+        }
+        
+        .scene-btn.active {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .stat {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .discoveries {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+        
+        .progress {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+        }
+        
+        .scene-container {
+            position: relative;
+            background: linear-gradient(135deg, #e8f4f8, #d1ecf1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 500px;
+            border: 3px solid #74b9ff;
+            overflow: hidden;
+        }
+        
+        .scene {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .scene.active {
+            display: block;
+        }
+        
+        .clickable-item {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 4em;
+            user-select: none;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+        }
+        
+        .clickable-item:hover {
+            transform: scale(1.2) rotate(5deg);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        
+        .clickable-item.discovered {
+            animation: discovered 1s ease-in-out;
+            filter: drop-shadow(0 0 15px #00b894);
+        }
+        
+        .fact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .fact-content {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 40px;
+            border-radius: 25px;
+            max-width: 600px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .fact-title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .fact-text {
+            font-size: 1.4em;
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .close-btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 112, 85, 0.4);
+        }
+        
+        .completion-message {
+            text-align: center;
+            font-size: 2em;
+            color: #00b894;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #d1f2eb, #a3e4d7);
+            border-radius: 15px;
+            border: 3px solid #00b894;
+            display: none;
+            animation: celebration 1.5s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5em;
+            }
+            
+            .scene-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .clickable-item {
+                font-size: 3em;
+            }
+            
+            .fact-content {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-8px) rotate(2deg); }
+            66% { transform: translateY(-4px) rotate(-1deg); }
+        }
+        
+        @keyframes discovered {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); filter: drop-shadow(0 0 20px #00b894); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.05) rotate(-1deg); }
+            75% { transform: scale(1.05) rotate(1deg); }
+        }
+        
+        /* Scene-specific styles */
+        .forest-scene {
+            background: linear-gradient(135deg, #00b894 0%, #55a3ff 50%, #74b9ff 100%);
+        }
+        
+        .ocean-scene {
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 50%, #a29bfe 100%);
+        }
+        
+        .space-scene {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 50%, #a29bfe 100%);
+        }
+        
+        .garden-scene {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 50%, #55efc4 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🔍 Let's Find Out! 🌟</h1>
+        
+        <div class="subtitle">
+            Click on anything that catches your eye to discover amazing facts!
+        </div>
+        
+        <div class="scene-selector">
+            <button class="scene-btn active" onclick="switchScene('forest')">🌳 Forest</button>
+            <button class="scene-btn" onclick="switchScene('ocean')">🌊 Ocean</button>
+            <button class="scene-btn" onclick="switchScene('space')">🚀 Space</button>
+            <button class="scene-btn" onclick="switchScene('garden')">🌺 Garden</button>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat discoveries">Discoveries: <span id="discoveries">0</span></div>
+            <div class="stat progress">Progress: <span id="progress">0%</span></div>
+        </div>
+        
+        <div class="scene-container">
+            <!-- Forest Scene -->
+            <div class="scene forest-scene active" id="forest-scene">
+                <div class="clickable-item" style="top: 20%; left: 15%;" data-fact="tree">🌳</div>
+                <div class="clickable-item" style="top: 40%; left: 60%;" data-fact="bird">🦅</div>
+                <div class="clickable-item" style="top: 60%; left: 30%;" data-fact="mushroom">🍄</div>
+                <div class="clickable-item" style="top: 70%; left: 70%;" data-fact="butterfly">🦋</div>
+                <div class="clickable-item" style="top: 30%; left: 80%;" data-fact="squirrel">🐿️</div>
+                <div class="clickable-item" style="top: 50%; left: 10%;" data-fact="flower">🌸</div>
+            </div>
+            
+            <!-- Ocean Scene -->
+            <div class="scene ocean-scene" id="ocean-scene">
+                <div class="clickable-item" style="top: 25%; left: 20%;" data-fact="whale">🐋</div>
+                <div class="clickable-item" style="top: 45%; left: 70%;" data-fact="fish">🐠</div>
+                <div class="clickable-item" style="top: 65%; left: 40%;" data-fact="octopus">🐙</div>
+                <div class="clickable-item" style="top: 35%; left: 80%;" data-fact="seahorse">🦄</div>
+                <div class="clickable-item" style="top: 55%; left: 15%;" data-fact="starfish">⭐</div>
+                <div class="clickable-item" style="top: 75%; left: 75%;" data-fact="crab">🦀</div>
+            </div>
+            
+            <!-- Space Scene -->
+            <div class="scene space-scene" id="space-scene">
+                <div class="clickable-item" style="top: 20%; left: 25%;" data-fact="sun">☀️</div>
+                <div class="clickable-item" style="top: 40%; left: 65%;" data-fact="moon">🌙</div>
+                <div class="clickable-item" style="top: 60%; left: 30%;" data-fact="planet">🪐</div>
+                <div class="clickable-item" style="top: 30%; left: 80%;" data-fact="rocket">🚀</div>
+                <div class="clickable-item" style="top: 70%; left: 70%;" data-fact="asteroid">☄️</div>
+                <div class="clickable-item" style="top: 50%; left: 10%;" data-fact="alien">👽</div>
+            </div>
+            
+            <!-- Garden Scene -->
+            <div class="scene garden-scene" id="garden-scene">
+                <div class="clickable-item" style="top: 25%; left: 20%;" data-fact="bee">🐝</div>
+                <div class="clickable-item" style="top: 45%; left: 60%;" data-fact="ladybug">🐞</div>
+                <div class="clickable-item" style="top: 35%; left: 80%;" data-fact="sunflower">🌻</div>
+                <div class="clickable-item" style="top: 65%; left: 25%;" data-fact="caterpillar">🐛</div>
+                <div class="clickable-item" style="top: 55%; left: 75%;" data-fact="rose">🌹</div>
+                <div class="clickable-item" style="top: 75%; left: 50%;" data-fact="snail">🐌</div>
+            </div>
+        </div>
+        
+        <div class="completion-message" id="completion-message">
+            🎉 Amazing! You've discovered everything in this scene! Try exploring other scenes! 🎉
+        </div>
+    </div>
+    
+    <!-- Fact Modal -->
+    <div class="fact-modal" id="fact-modal">
+        <div class="fact-content">
+            <div class="fact-title" id="fact-title"></div>
+            <div class="fact-text" id="fact-text"></div>
+            <button class="close-btn" onclick="closeFact()">Got it! 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        let discoveries = 0;
+        let currentScene = 'forest';
+        let discoveredItems = new Set();
+        
+        const facts = {
+            // Forest Scene
+            tree: {
+                title: "🌳 Amazing Trees!",
+                text: "Trees can live for thousands of years! The oldest tree in the world is over 4,800 years old. Trees also talk to each other through their roots by sharing nutrients and information!"
+            },
+            bird: {
+                title: "🦅 Fantastic Birds!",
+                text: "Birds are the only animals with feathers! Some birds can fly backwards, and others can sleep while flying. The Arctic Tern travels from Arctic to Antarctic every year - that's like flying to the moon and back!"
+            },
+            mushroom: {
+                title: "🍄 Magical Mushrooms!",
+                text: "Mushrooms are neither plants nor animals - they're fungi! Some mushrooms glow in the dark, and the largest living thing on Earth is actually a giant mushroom underground!"
+            },
+            butterfly: {
+                title: "🦋 Beautiful Butterflies!",
+                text: "Butterflies taste with their feet! They can see colors that humans can't see, including ultraviolet light. Some butterflies migrate thousands of miles, just like birds!"
+            },
+            squirrel: {
+                title: "🐿️ Clever Squirrels!",
+                text: "Squirrels can remember where they buried thousands of nuts! They sometimes pretend to bury nuts to fool other squirrels watching them. Baby squirrels are called kits!"
+            },
+            flower: {
+                title: "🌸 Wonderful Flowers!",
+                text: "Flowers have been around for over 100 million years! Some flowers can change color, and others only bloom once every few years. Bees see special patterns on flowers that we can't see!"
+            },
+            
+            // Ocean Scene
+            whale: {
+                title: "🐋 Magnificent Whales!",
+                text: "Blue whales are the largest animals that have ever lived on Earth - bigger than dinosaurs! Their hearts alone can weigh as much as a car, and you could crawl through their blood vessels!"
+            },
+            fish: {
+                title: "🐠 Fantastic Fish!",
+                text: "Fish have been around for over 500 million years! Some fish can change color instantly, others can walk on land, and some even generate electricity to catch their food!"
+            },
+            octopus: {
+                title: "🐙 Incredible Octopuses!",
+                text: "Octopuses have three hearts and blue blood! They're incredibly smart - they can solve puzzles, open jars, and each of their eight arms can taste and smell independently!"
+            },
+            seahorse: {
+                title: "🦄 Special Seahorses!",
+                text: "Seahorses are the only animals where the male gets pregnant and gives birth! They can change color like chameleons and move each eye independently to look in different directions!"
+            },
+            starfish: {
+                title: "⭐ Amazing Starfish!",
+                text: "Starfish can regrow their arms if they lose them! They have no brain or blood, but they can turn their stomach inside out to eat. Some starfish have 40 arms instead of just 5!"
+            },
+            crab: {
+                title: "🦀 Cool Crabs!",
+                text: "Crabs walk sideways because their legs bend that way! Some crabs live on land, others in deep ocean trenches. They can regrow lost claws and communicate by waving their claws!"
+            },
+            
+            // Space Scene
+            sun: {
+                title: "☀️ Our Amazing Sun!",
+                text: "The Sun is so big that over 1 million Earths could fit inside it! It's actually a giant star, and the light we see took 8 minutes to travel from the Sun to Earth!"
+            },
+            moon: {
+                title: "🌙 Marvelous Moon!",
+                text: "The Moon is slowly moving away from Earth - about as fast as your fingernails grow! It's the reason we have ocean tides, and without it, our days would only be 6 hours long!"
+            },
+            planet: {
+                title: "🪐 Fantastic Planets!",
+                text: "Saturn is so light it would float in water! Jupiter has a storm that's been raging for over 400 years, and Venus spins backwards compared to most other planets!"
+            },
+            rocket: {
+                title: "🚀 Incredible Rockets!",
+                text: "Rockets work in space even though there's no air to push against! They carry their own oxygen and can reach speeds of over 25,000 miles per hour to escape Earth's gravity!"
+            },
+            asteroid: {
+                title: "☄️ Amazing Asteroids!",
+                text: "Most asteroids are found in a belt between Mars and Jupiter! Some asteroids are made of metal and could contain more gold than has ever been mined on Earth!"
+            },
+            alien: {
+                title: "👽 Mysterious Space Life!",
+                text: "Scientists are constantly searching for signs of life in space! There might be tiny organisms living on Mars or in the oceans under the ice on Jupiter's moons!"
+            },
+            
+            // Garden Scene
+            bee: {
+                title: "🐝 Busy Bees!",
+                text: "Bees dance to tell other bees where to find flowers! A single bee colony can have up to 80,000 bees, and they make honey by mixing flower nectar with special enzymes in their stomachs!"
+            },
+            ladybug: {
+                title: "🐞 Lucky Ladybugs!",
+                text: "Ladybugs are actually beetles, not bugs! They can eat up to 5,000 plant-eating pests in their lifetime, making them super helpful garden friends. They hibernate together in groups during winter!"
+            },
+            sunflower: {
+                title: "🌻 Super Sunflowers!",
+                text: "Sunflowers can grow over 30 feet tall! They follow the sun across the sky when they're young, and their seeds are arranged in a perfect mathematical pattern called the Fibonacci sequence!"
+            },
+            caterpillar: {
+                title: "🐛 Changing Caterpillars!",
+                text: "Caterpillars completely dissolve inside their cocoon and rebuild themselves as butterflies! Some caterpillars can increase their body weight by thousands of times before becoming a butterfly!"
+            },
+            rose: {
+                title: "🌹 Royal Roses!",
+                text: "Roses have been around for 35 million years! They're related to apples, and rose hips (the fruit) are packed with vitamin C - more than oranges! Some roses can live for over 1,000 years!"
+            },
+            snail: {
+                title: "🐌 Slow Snails!",
+                text: "Snails can sleep for up to 3 years at a time! They have thousands of tiny teeth and can climb up glass walls. Some snails are so small they could fit through the eye of a needle!"
+            }
+        };
+        
+        function switchScene(sceneName) {
+            // Hide all scenes
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            
+            // Show selected scene
+            document.getElementById(sceneName + '-scene').classList.add('active');
+            
+            // Update active button
+            document.querySelectorAll('.scene-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentScene = sceneName;
+            updateProgress();
+        }
+        
+        function showFact(factKey, element) {
+            const fact = facts[factKey];
+            if (!fact) return;
+            
+            // Mark as discovered
+            const itemKey = currentScene + '-' + factKey;
+            if (!discoveredItems.has(itemKey)) {
+                discoveredItems.add(itemKey);
+                discoveries++;
+                updateStats();
+                element.classList.add('discovered');
+            }
+            
+            // Show modal
+            document.getElementById('fact-title').textContent = fact.title;
+            document.getElementById('fact-text').textContent = fact.text;
+            document.getElementById('fact-modal').style.display = 'flex';
+            
+            // Check if scene is complete
+            checkSceneCompletion();
+        }
+        
+        function closeFact() {
+            document.getElementById('fact-modal').style.display = 'none';
+        }
+        
+        function updateStats() {
+            document.getElementById('discoveries').textContent = discoveries;
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const currentSceneItems = document.querySelectorAll(`#${currentScene}-scene .clickable-item`);
+            const discoveredInScene = Array.from(currentSceneItems).filter(item => 
+                discoveredItems.has(currentScene + '-' + item.dataset.fact)
+            ).length;
+            
+            const progress = Math.round((discoveredInScene / currentSceneItems.length) * 100);
+            document.getElementById('progress').textContent = progress + '%';
+        }
+        
+        function checkSceneCompletion() {
+            const currentSceneItems = document.querySelectorAll(`#${currentScene}-scene .clickable-item`);
+            const discoveredInScene = Array.from(currentSceneItems).filter(item => 
+                discoveredItems.has(currentScene + '-' + item.dataset.fact)
+            ).length;
+            
+            if (discoveredInScene === currentSceneItems.length) {
+                setTimeout(() => {
+                    document.getElementById('completion-message').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('completion-message').style.display = 'none';
+                    }, 4000);
+                }, 1000);
+            }
+        }
+        
+        // Add click event listeners to all clickable items
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.clickable-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    showFact(this.dataset.fact, this);
+                });
+            });
+            
+            updateStats();
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('fact-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFact();
+            }
+        });
+    </script>
+</body>
+</html>

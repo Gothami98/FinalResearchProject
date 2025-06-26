@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Number 1 Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            color: #2c3e50;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 4em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .instructions {
+            text-align: center;
+            font-size: 2.2em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #e67e22;
+            font-weight: bold;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            padding: 20px 40px;
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+            min-height: 400px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            border: 3px solid #3498db;
+        }
+        
+        .number-card {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            border: 4px solid #bdc3c7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .number-card:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: #3498db;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        }
+        
+        .number-card.correct {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            animation: correctPulse 1s ease-in-out;
+            pointer-events: none;
+        }
+        
+        .number-card.incorrect {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .number-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 2.8em;
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.5s ease;
+        }
+        
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 3px solid #28a745;
+            animation: successGlow 1.5s ease-in-out;
+        }
+        
+        .feedback.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 3px solid #dc3545;
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        .feedback.hint {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 3px solid #ffc107;
+            animation: hintGlow 1s ease-in-out;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 20px 50px;
+            font-size: 2em;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .next-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.4);
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 4em;
+            margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 2s ease-in-out;
+        }
+        
+        .hint-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #ffc107, #ffca2c);
+            color: #212529;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .hint-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .number-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .number-card {
+                width: 100px;
+                height: 100px;
+                font-size: 3.5em;
+            }
+            
+            .title {
+                font-size: 2.8em;
+            }
+            
+            .score-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .instructions {
+                font-size: 1.8em;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.2); box-shadow: 0 0 40px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(40, 167, 69, 0.5); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes successGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(40, 167, 69, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(40, 167, 69, 0.6); }
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes hintGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 193, 7, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 193, 7, 0.6); }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.3) rotate(-10deg); }
+            75% { transform: scale(1.3) rotate(10deg); }
+        }
+        
+        .number-one-highlight {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ffd700, #ffed4e);
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🔍 Find the Number 1! 🎯</h1>
+        
+        <div class="instructions">
+            Click on the number 1 to win!
+        </div>
+        
+        <div class="score-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="number-grid" id="number-grid">
+            <!-- Numbers will be generated here -->
+        </div>
+        
+        <button class="hint-btn" id="hint-btn" onclick="showHint()">💡 Show Hint</button>
+        
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Level! 🚀</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let gameComplete = false;
+        let hintUsed = false;
+        
+        const successMessages = [
+            "🎉 Perfect! You found the number 1! 🎉",
+            "⭐ Amazing! Great job finding 1! ⭐",
+            "🌟 Fantastic! You're a number detective! 🌟",
+            "🚀 Incredible! You spotted the 1! 🚀",
+            "🏆 Excellent work! You found it! 🏆"
+        ];
+        
+        const errorMessages = [
+            "🤔 That's not 1! Try again!",
+            "😅 Oops! Look for the number 1!",
+            "🔍 Keep looking for the number 1!",
+            "💪 You can do it! Find the 1!",
+            "🎯 Close, but look for number 1!"
+        ];
+        
+        function getNumbersForLevel(level) {
+            const numbers = [];
+            const numCount = Math.min(6 + level, 12); // Start with 6, max 12 numbers
+            
+            // Always include the number 1
+            numbers.push(1);
+            
+            // Add other numbers based on level
+            const otherNumbers = [];
+            if (level <= 3) {
+                // Easy: numbers 0-5
+                otherNumbers.push(0, 2, 3, 4, 5);
+            } else if (level <= 6) {
+                // Medium: numbers 0-9 
+                otherNumbers.push(0, 2, 3, 4, 5, 6, 7, 8, 9);
+            } else {
+                // Hard: numbers 0-20
+                for (let i = 0; i <= 20; i++) {
+                    if (i !== 1) otherNumbers.push(i);
+                }
+            }
+            
+            // Shuffle and pick random numbers
+            const shuffled = otherNumbers.sort(() => 0.5 - Math.random());
+            numbers.push(...shuffled.slice(0, numCount - 1));
+            
+            // Shuffle the final array
+            return numbers.sort(() => 0.5 - Math.random());
+        }
+        
+        function setupLevel() {
+            gameComplete = false;
+            hintUsed = false;
+            
+            const numbers = getNumbersForLevel(level);
+            displayNumbers(numbers);
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            document.getElementById('hint-btn').style.display = 'block';
+            
+            // Remove any existing highlights
+            document.querySelectorAll('.number-one-highlight').forEach(h => h.remove());
+        }
+        
+        function displayNumbers(numbers) {
+            const grid = document.getElementById('number-grid');
+            grid.innerHTML = '';
+            
+            numbers.forEach((num, index) => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                card.textContent = num;
+                card.onclick = () => handleNumberClick(num, card);
+                card.id = `number-${index}`;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        function handleNumberClick(number, card) {
+            if (gameComplete) return;
+            
+            if (number === 1) {
+                // Correct answer
+                card.classList.add('correct');
+                score += (hintUsed ? 5 : 10); // Less points if hint was used
+                updateScore();
+                showSuccessFeedback();
+                completeLevel();
+                
+                // Disable all other cards
+                document.querySelectorAll('.number-card').forEach(c => {
+                    if (c !== card) {
+                        c.classList.add('disabled');
+                    }
+                });
+                
+            } else {
+                // Wrong answer
+                card.classList.add('incorrect');
+                showErrorFeedback();
+                
+                // Reset card after animation
+                setTimeout(() => {
+                    card.classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function showSuccessFeedback() {
+            const feedback = document.getElementById('feedback');
+            const message = successMessages[Math.floor(Math.random() * successMessages.length)];
+            feedback.textContent = message;
+            feedback.className = 'feedback success';
+        }
+        
+        function showErrorFeedback() {
+            const feedback = document.getElementById('feedback');
+            const message = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+            feedback.textContent = message;
+            feedback.className = 'feedback error';
+            
+            // Clear error message after 2 seconds
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2000);
+        }
+        
+        function showHint() {
+            if (gameComplete || hintUsed) return;
+            
+            hintUsed = true;
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = "💡 Look for the number that looks like a straight line! It's the smallest counting number!";
+            feedback.className = 'feedback hint';
+            
+            // Add sparkle effect to the number 1
+            const numberCards = document.querySelectorAll('.number-card');
+            numberCards.forEach(card => {
+                if (card.textContent === '1') {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'number-one-highlight';
+                    card.appendChild(sparkle);
+                }
+            });
+            
+            document.getElementById('hint-btn').style.display = 'none';
+            
+            // Clear hint message after 4 seconds
+            setTimeout(() => {
+                if (!gameComplete) {
+                    feedback.textContent = '';
+                    feedback.className = 'feedback';
+                }
+            }, 4000);
+        }
+        
+        function completeLevel() {
+            gameComplete = true;
+            
+            const celebration = document.getElementById('celebration');
+            celebration.textContent = "🎊 Level Complete! You found the number 1! 🎊";
+            celebration.classList.add('show');
+            
+            document.getElementById('next-btn').classList.add('show');
+            document.getElementById('hint-btn').style.display = 'none';
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            document.getElementById('level').textContent = level;
+        }
+        
+        function nextLevel() {
+            level++;
+            updateLevel();
+            setupLevel();
+        }
+        
+        // Initialize game
+        updateScore();
+        updateLevel();
+        setupLevel();
+    </script>
+</body>
+</html>
