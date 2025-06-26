@@ -541,10 +541,14 @@
     }
 
     window.onload = function() {
+<<<<<<< HEAD
       // Remove the score reset
       // localStorage.setItem('activityScore', '0');
       
       // Initialize the game
+=======
+      localStorage.setItem('activityScore', '0');
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
       initGame();
       
       // Play instructions automatically when page loads
@@ -582,6 +586,7 @@
     instructionSound.addEventListener('ended', () => {
       if (soundWave) soundWave.classList.remove("active");
     });
+<<<<<<< HEAD
 
     document.addEventListener('DOMContentLoaded', function() {
       const activityElements = document.querySelectorAll('.activity-element'); // Adjust selector based on your activity elements
@@ -615,6 +620,8 @@
         });
       });
     });
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
   </script>
 </body>
 </html>

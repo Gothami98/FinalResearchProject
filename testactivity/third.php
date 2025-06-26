@@ -11,9 +11,12 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+<<<<<<< HEAD
   <!-- Add score.js -->
   <script src="score.js"></script>
 
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
   <style>
     body {
       margin: 0;
@@ -368,6 +371,7 @@
 
 <script>
   window.onload = function() {
+<<<<<<< HEAD
     // Play instructions automatically when page loads
     setTimeout(() => {
       playInstructions();
@@ -389,6 +393,31 @@
       }, 500);
     }
   });
+=======
+  localStorage.setItem('activityScore', '0');
+  
+  // Play instructions automatically when page loads
+  setTimeout(() => {
+    playInstructions();
+  }, 500); // Small delay to ensure page is fully loaded
+};
+
+// Also play instructions when page is refreshed or reloaded
+window.addEventListener('beforeunload', function() {
+  // Set a flag to indicate the page is being refreshed
+  sessionStorage.setItem('pageRefreshed', 'true');
+});
+
+// Check if page was refreshed and play instructions
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('pageRefreshed') === 'true') {
+    sessionStorage.removeItem('pageRefreshed');
+    setTimeout(() => {
+      playInstructions();
+    }, 500);
+  }
+});
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 
 
 
@@ -489,6 +518,7 @@ instructionSound.addEventListener('ended', () => {
       }
     }
   </script>
+<<<<<<< HEAD
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -518,5 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 </body>
 </html>

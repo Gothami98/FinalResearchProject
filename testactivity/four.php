@@ -11,9 +11,12 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+<<<<<<< HEAD
   <!-- Add score.js -->
   <script src="score.js"></script>
 
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
   <style>
     body {
       margin: 0;
@@ -511,6 +514,7 @@ instructionSound.addEventListener('ended', () => {
 
 
 window.onload = function() {
+<<<<<<< HEAD
     // Remove the score reset
     // localStorage.setItem('activityScore', '0');
     
@@ -518,6 +522,14 @@ window.onload = function() {
     setTimeout(() => {
         playInstructions();
     }, 500);
+=======
+  localStorage.setItem('activityScore', '0');
+  
+  // Play instructions automatically when page loads
+  setTimeout(() => {
+    playInstructions();
+  }, 500); // Small delay to ensure page is fully loaded
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 };
 
 // Also play instructions when page is refreshed or reloaded
@@ -536,6 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+<<<<<<< HEAD
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -610,5 +623,7 @@ instructionSound.addEventListener('ended', () => {
     soundWave.classList.remove("active");
 });
 </script>
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 </body>
 </html>

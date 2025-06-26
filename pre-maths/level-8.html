@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weight Scale Learning Game</title>
+    <title>Apple Balance Scale Game</title>
     <style>
         * {
             margin: 0;
@@ -120,9 +121,10 @@
             border-color: rgba(243, 156, 18, 0.4);
         }
         
+        
         .game-container {
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
             padding: 40px;
@@ -130,9 +132,18 @@
             color: #2c3e50;
         }
         
+        .title {
+            text-align: center;
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
         .instructions {
             text-align: center;
-            font-size: 1.6em;
+            font-size: 1.8em;
             color: #34495e;
             margin-bottom: 30px;
             background: linear-gradient(135deg, #e8f8ff, #cce7ff);
@@ -140,6 +151,44 @@
             border-radius: 15px;
             border-left: 5px solid #3498db;
             font-weight: bold;
+        }
+        
+        .click-instruction {
+            text-align: center;
+            font-size: 1.6em;
+            color: #34495e;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-weight: bold;
+        }
+        
+        .score-level-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .score, .level {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 20px 30px;
+            border-radius: 15px;
+            flex: 1;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .level {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
         }
         
         .question {
@@ -186,7 +235,7 @@
             background: linear-gradient(135deg, #2c3e50, #34495e);
             border-radius: 6px;
             transform-origin: center center;
-            transition: transform 1.5s ease-in-out;
+            transition: transform 1s ease-in-out;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
         
@@ -206,8 +255,8 @@
         .balance-plate {
             position: absolute;
             top: 100px;
-            width: 220px;
-            height: 100px;
+            width: 200px;
+            height: 80px;
             background: linear-gradient(135deg, #f39c12, #e67e22);
             border-radius: 15px;
             border: 4px solid #d35400;
@@ -228,13 +277,13 @@
         }
         
         .balance-plate.clicked {
-            opacity: 0.8;
+            opacity: 0.7;
             cursor: not-allowed;
             pointer-events: none;
         }
         
         .balance-plate.correct {
-            animation: correctPulse 1s ease-in-out;
+            animation: correctPulse 0.8s ease-in-out;
             border-color: #28a745;
             box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
         }
@@ -246,31 +295,41 @@
         }
         
         .left-plate {
-            left: 40px;
+            left: 50px;
         }
         
         .right-plate {
-            right: 40px;
+            right: 50px;
+        }
+        
+        .plate-objects {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 5px;
         }
         
         .plate-object {
-            font-size: 4em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             animation: float 2s ease-in-out infinite;
-            margin: 10px;
+            animation-delay: var(--delay);
         }
         
-        .weight-info {
-            font-size: 1.2em;
+        .apple-count {
+            font-size: 1.1em;
             font-weight: bold;
             color: #2c3e50;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-            margin-top: 8px;
+            margin-top: 5px;
         }
         
         .feedback {
             text-align: center;
-            font-size: 1.8em;
+            font-size: 2em;
             margin: 30px 0;
             padding: 25px;
             border-radius: 15px;
@@ -293,6 +352,7 @@
             background: linear-gradient(135deg, #f8d7da, #f5c6cb);
             color: #721c24;
             border: 3px solid #dc3545;
+            animation: errorShake 0.6s ease-in-out;
         }
         
         .next-btn {
@@ -323,194 +383,49 @@
             box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
         }
         
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-            margin: 10% auto;
-            padding: 40px;
-            border-radius: 20px;
-            width: 80%;
-            max-width: 600px;
+        .celebration {
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease;
-            position: relative;
-        }
-        
-        .modal h2 {
-            color: #e74c3c;
             font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        
-        .modal p {
-            font-size: 1.4em;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .theory-box {
-            background: linear-gradient(135deg, #e8f4f8, #d4e7f2);
-            padding: 25px;
-            border-radius: 15px;
-            border-left: 5px solid #3498db;
             margin: 20px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
         }
         
-        .close-btn {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.3em;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
+        .celebration.show {
+            opacity: 1;
+            visibility: visible;
+            animation: celebrate 1.2s ease-in-out;
         }
         
-        .close-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-        }
-
-        /* Success Modal Styles */
-        .success-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .success-modal-content {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            margin: 15% auto;
-            padding: 40px;
-            border-radius: 20px;
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            animation: successSlideIn 0.5s ease;
-            position: relative;
-            border: 3px solid #28a745;
-        }
-        
-        .success-modal h2 {
-            color: #155724;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            animation: successBounce 0.8s ease-in-out;
-        }
-        
-        .success-modal p {
-            font-size: 1.6em;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            color: #155724;
-            font-weight: bold;
-        }
-        
-        .next-round-btn {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 1.4em;
-            border-radius: 15px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .next-round-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
-        }
-
-        @keyframes successSlideIn {
-            from { transform: translateY(-100px) scale(0.8); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        @keyframes successBounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .header-left, .header-right {
-                gap: 10px;
-            }
-            
-            .nav-icon {
-                padding: 10px;
-                min-width: 40px;
-                height: 40px;
-                font-size: 1em;
-            }
-            
-            .header-title {
-                font-size: 1.5em;
-            }
-            
-            .score-level-display {
-                gap: 10px;
-            }
-            
             .balance-arm {
                 width: 400px;
             }
             
             .balance-plate {
-                width: 160px;
-                height: 80px;
+                width: 150px;
+                height: 70px;
             }
             
             .left-plate {
-                left: 20px;
+                left: 25px;
             }
             
             .right-plate {
-                right: 20px;
+                right: 25px;
             }
             
             .plate-object {
-                font-size: 3em;
+                font-size: 1.8em;
             }
             
-            .modal-content {
-                width: 95%;
-                margin: 5% auto;
-                padding: 20px;
+            .score-level-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 2em;
             }
         }
         
@@ -522,13 +437,13 @@
         
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-5px); }
         }
         
         @keyframes correctPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(40, 167, 69, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
         }
         
         @keyframes errorShake {
@@ -538,67 +453,36 @@
         }
         
         @keyframes successPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-3deg); }
+            75% { transform: scale(1.2) rotate(3deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Header with Navigation -->
-    <div class="header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="nav-icon" onclick="goBack()" title="Back">
-                    ⬅️
-                </div>
-                <div class="nav-icon" onclick="goHome()" title="Home">
-                    🏠
-                </div>
-                <div class="nav-icon" onclick="tryAgain()" title="Try Again">
-                    🔄
-                </div>
-            </div>
-            
-            <div class="header-center">
-                <h1 class="header-title">⚖️ Weight Scale Learning Game 🍉🍎</h1>
-            </div>
-            
-            <div class="header-right">
-                <div class="score-level-display">
-                    <div class="score-display">
-                        🏆 <span id="score">0</span>
-                    </div>
-                    <div class="level-display">
-                        📊 L<span id="level">1</span>
-                    </div>
-                </div>
-                <div class="nav-icon" onclick="refreshGame()" title="Refresh">
-                    🔄
-                </div>
-                <div class="nav-icon" onclick="openSettings()" title="Settings">
-                    ⚙️
-                </div>
-                <div class="nav-icon" onclick="openAccount()" title="Account">
-                    👤
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="game-container">
+        <h1 class="title">🍎 Apple Balance Game ⚖️</h1>
         
-        <div class="question" id="question">Which side is heavier?</div>
+        <div class="instructions">
+            Count the apples on each side! Click on the side with MORE apples!
+        </div>
+        
+        <div class="click-instruction">
+            👆 Click on the side that has MORE apples!
+        </div>
+        
+        <div class="score-level-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level">Level: <span id="level">1</span></div>
+        </div>
+        
+        <div class="question" id="question">Which side has more apples?</div>
         
         <div class="balance-container">
             <div class="balance-stand"></div>
@@ -606,146 +490,139 @@
             <div class="balance-center"></div>
             
             <div class="balance-plate left-plate" id="left-plate" onclick="handlePlateClick('left')">
-                <div id="left-object" class="plate-object"></div>
-                <div class="weight-info" id="left-weight"></div>
+                <div class="plate-objects" id="left-objects"></div>
+                <div class="apple-count" id="left-count"></div>
             </div>
             
             <div class="balance-plate right-plate" id="right-plate" onclick="handlePlateClick('right')">
-                <div id="right-object" class="plate-object"></div>
-                <div class="weight-info" id="right-weight"></div>
+                <div class="plate-objects" id="right-objects"></div>
+                <div class="apple-count" id="right-count"></div>
             </div>
         </div>
         
-        <!-- <div class="feedback" id="feedback"></div> -->
+        <div class="feedback" id="feedback"></div>
+        <div class="celebration" id="celebration"></div>
         
-    </div>
-
-    <!-- Modal for wrong answers -->
-    <div id="theory-modal" class="modal">
-        <div class="modal-content">
-            <h2>🤔 Let's Learn About Weight!</h2>
-            <div class="theory-box">
-                <p><strong>Weight Theory:</strong></p>
-                <p id="theory-text"></p>
-                <p>💡 <strong>Remember:</strong> Heavier objects make their side of the scale go down!</p>
-            </div>
-            <button class="close-btn" onclick="closeModal()">Got it! Let's try again! 🎯</button>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="success-modal" class="success-modal">
-        <div class="success-modal-content">
-            <h2>🎉 Excellent! 🎉</h2>
-            <p>You found the heavier side!</p>
-            <p>🏆 +10 Points! 🏆</p>
-            <button class="next-round-btn"   onclick="window.location.href='../advanced_level/test8.php'">Next Round ➡️</button>
-        </div>
+        <button class="next-btn" id="next-btn" onclick="nextLevel()">Next Round ➡️</button>
     </div>
 
     <script>
         let score = 0;
         let level = 1;
         let gameComplete = false;
-        let heavierSide = '';
+        let leftApples = 0;
+        let rightApples = 0;
         
-        const gameScenarios = [
-            {
-                left: { emoji: '🍉', name: 'Watermelon', weight: '5 kg' },
-                right: { emoji: '🍎', name: 'Apple', weight: '0.2 kg' },
-                heavier: 'left',
-                theory: 'A watermelon weighs about 5 kg, while an apple weighs only 0.2 kg. The watermelon is 25 times heavier than the apple!'
-            },
-            {
-                left: { emoji: '🍎', name: 'Apple', weight: '0.2 kg' },
-                right: { emoji: '🍉', name: 'Watermelon', weight: '5 kg' },
-                heavier: 'right',
-                theory: 'A watermelon weighs about 5 kg, while an apple weighs only 0.2 kg. The watermelon is much heavier!'
-            },
-            {
-                left: { emoji: '🏀', name: 'Basketball', weight: '0.6 kg' },
-                right: { emoji: '🍎', name: 'Apple', weight: '0.2 kg' },
-                heavier: 'left',
-                theory: 'A basketball weighs about 0.6 kg, while an apple weighs 0.2 kg. The basketball is 3 times heavier!'
-            },
-            {
-                left: { emoji: '🍌', name: 'Banana', weight: '0.1 kg' },
-                right: { emoji: '🥭', name: 'Mango', weight: '0.5 kg' },
-                heavier: 'right',
-                theory: 'A mango weighs about 0.5 kg, while a banana weighs only 0.1 kg. The mango is 5 times heavier!'
-            },
-            {
-                left: { emoji: '📚', name: 'Book', weight: '0.5 kg' },
-                right: { emoji: '🍊', name: 'Orange', weight: '0.3 kg' },
-                heavier: 'left',
-                theory: 'A thick book weighs about 0.5 kg, while an orange weighs 0.3 kg. The book is heavier!'
-            }
+        const successMessages = [
+            "🎉 Perfect! You counted correctly! 🎉",
+            "⭐ Excellent! Great counting! ⭐",
+            "🌟 Amazing! You found more apples! 🌟",
+            "🚀 Fantastic! Perfect counting skills! 🚀",
+            "🏆 Outstanding! You're a counting expert! 🏆"
         ];
-
-        // Navigation Functions
-        function goBack() {
-            alert('🔙 Going back to previous page...');
+        
+        const errorMessages = [
+            "🤔 Not quite! Count the apples again! 🔍",
+            "💭 Good try! Which side has MORE apples? 👀",
+            "📚 Keep learning! Count each apple! 📚",
+            "🎯 Almost! Look carefully at both sides! ⚖️",
+            "💡 Try again! Count: 1, 2, 3... 🔢"
+        ];
+        
+        const completionMessages = [
+            "🎊 Amazing! You're great at counting! 🎊",
+            "🌟 Perfect! You understand more and less! 🌟",
+            "🎉 Fantastic work! Great job! 🎉",
+            "🚀 Incredible! You're a counting star! 🚀",
+            "⭐ Outstanding! Well done! ⭐"
+        ];
+        
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
         }
-
-        function goHome() {
-            if (confirm('🏠 Are you sure you want to go home? Your progress will be reset.')) {
-                location.reload();
+        
+        function generateAppleCounts() {
+            // Create different apple counts for variety
+            const combinations = [
+                [2, 3], [1, 4], [3, 5], [2, 5], [1, 3],
+                [4, 6], [3, 6], [2, 4], [1, 2], [5, 7]
+            ];
+            
+            const selected = getRandomItem(combinations);
+            
+            // Randomly assign to left/right
+            if (Math.random() > 0.5) {
+                return { left: selected[0], right: selected[1] };
+            } else {
+                return { left: selected[1], right: selected[0] };
             }
-        }
-
-        function tryAgain() {
-            if (confirm('🔄 Try this level again?')) {
-                setupBalance();
-            }
-        }
-
-        function refreshGame() {
-            if (confirm('🔄 Refresh the entire game? Your progress will be reset.')) {
-                score = 0;
-                level = 1;
-                updateScore();
-                updateLevel();
-                setupBalance();
-            }
-        }
-
-        function openSettings() {
-            alert('⚙️ Settings menu would open here!\n\n• Sound effects\n• Difficulty level\n• Theme selection\n• Language options');
-        }
-
-        function openAccount() {
-            alert('👤 Account menu would open here!\n\n• View profile\n• Achievement badges\n• Learning progress\n• Statistics');
         }
         
         function setupBalance() {
             gameComplete = false;
             
-            // Get random scenario
-            const scenario = gameScenarios[Math.floor(Math.random() * gameScenarios.length)];
-            heavierSide = scenario.heavier;
+            // Generate apple counts
+            const appleCounts = generateAppleCounts();
+            leftApples = appleCounts.left;
+            rightApples = appleCounts.right;
             
-            // Set up left side
-            document.getElementById('left-object').textContent = scenario.left.emoji;
-            document.getElementById('left-weight').textContent = `${scenario.left.name} (${scenario.left.weight})`;
+            // Display apples
+            displayApples('left', leftApples);
+            displayApples('right', rightApples);
             
-            // Set up right side
-            document.getElementById('right-object').textContent = scenario.right.emoji;
-            document.getElementById('right-weight').textContent = `${scenario.right.name} (${scenario.right.weight})`;
+            // Animate balance
+            animateBalance();
             
-            // Store theory for potential modal
-            window.currentTheory = scenario.theory;
-            
-            // Initially show balanced scale
-            document.getElementById('balance-arm').style.transform = 'translateX(-50%) rotate(0deg)';
+            // Update question
+            updateQuestion();
             
             // Reset plates
             document.getElementById('left-plate').classList.remove('clicked', 'correct', 'incorrect');
             document.getElementById('right-plate').classList.remove('clicked', 'correct', 'incorrect');
+        }
+        
+        function displayApples(side, count) {
+            const objectsContainer = document.getElementById(`${side}-objects`);
+            const countContainer = document.getElementById(`${side}-count`);
             
-            // Clear feedback
-            document.getElementById('feedback').textContent = '';
-            document.getElementById('feedback').className = 'feedback';
-            document.getElementById('next-btn').classList.remove('show');
+            objectsContainer.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const appleElement = document.createElement('span');
+                appleElement.className = 'plate-object';
+                appleElement.textContent = '🍎';
+                appleElement.style.setProperty('--delay', `${i * 0.2}s`);
+                appleElement.title = `Apple ${i + 1}`;
+                objectsContainer.appendChild(appleElement);
+            }
+            
+            countContainer.textContent = `${count} apple${count !== 1 ? 's' : ''}`;
+        }
+        
+        function animateBalance() {
+            const balanceArm = document.getElementById('balance-arm');
+            const appleDifference = rightApples - leftApples;
+            
+            // Calculate rotation angle (max 20 degrees)
+            const maxAngle = 20;
+            const angle = Math.min(Math.max(appleDifference * 4, -maxAngle), maxAngle);
+            
+            setTimeout(() => {
+                balanceArm.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            }, 500);
+        }
+        
+        function updateQuestion() {
+            const question = document.getElementById('question');
+            const difference = Math.abs(leftApples - rightApples);
+            
+            if (difference === 1) {
+                question.textContent = "Which side has more apples? Look carefully!";
+            } else if (difference >= 2) {
+                question.textContent = "Count the apples! Which side has MORE?";
+            } else {
+                question.textContent = "Which side has more apples?";
+            }
         }
         
         function handlePlateClick(side) {
@@ -754,77 +631,62 @@
             const leftPlate = document.getElementById('left-plate');
             const rightPlate = document.getElementById('right-plate');
             const feedback = document.getElementById('feedback');
-            const balanceArm = document.getElementById('balance-arm');
             
-            // Disable further clicks
             leftPlate.classList.add('clicked');
             rightPlate.classList.add('clicked');
             
-            // Show the correct weight distribution
-            setTimeout(() => {
-                if (heavierSide === 'left') {
-                    balanceArm.style.transform = 'translateX(-50%) rotate(-15deg)';
-                } else {
-                    balanceArm.style.transform = 'translateX(-50%) rotate(15deg)';
-                }
-            }, 300);
+            const isCorrect = (side === 'left' && leftApples > rightApples) || 
+                             (side === 'right' && rightApples > leftApples);
             
-            if (side === heavierSide) {
+            if (isCorrect) {
                 // Correct answer
                 score += 10;
                 const clickedPlate = document.getElementById(`${side}-plate`);
                 clickedPlate.classList.add('correct');
                 
-                // Show success modal instead of inline feedback
+                const message = getRandomItem(successMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback success';
+                
                 setTimeout(() => {
                     gameComplete = true;
-                    showSuccessModal();
-                }, 1500);
+                    const celebration = document.getElementById('celebration');
+                    const completionMsg = getRandomItem(completionMessages);
+                    
+                    celebration.textContent = completionMsg;
+                    celebration.classList.add('show');
+                    
+                    document.getElementById('next-btn').classList.add('show');
+                }, 1000);
                 
             } else {
-                // Wrong answer - show modal with theory
+                // Wrong answer
                 const clickedPlate = document.getElementById(`${side}-plate`);
                 clickedPlate.classList.add('incorrect');
                 
-                // Highlight correct plate
-                const correctPlate = document.getElementById(`${heavierSide}-plate`);
-                setTimeout(() => {
-                    correctPlate.classList.add('correct');
-                }, 800);
+                const message = getRandomItem(errorMessages);
+                feedback.textContent = message;
+                feedback.className = 'feedback error';
                 
-             
-                // Show theory modal
+                // Show correct answer
                 setTimeout(() => {
-                    showTheoryModal();
+                    const correctSide = leftApples > rightApples ? 'left' : 'right';
+                    const correctPlate = document.getElementById(`${correctSide}-plate`);
+                    correctPlate.classList.add('correct');
+                    
+                    const correctCount = correctSide === 'left' ? leftApples : rightApples;
+                    const incorrectCount = correctSide === 'left' ? rightApples : leftApples;
+                    
+                    feedback.textContent = `The ${correctSide} side has more! (${correctCount} vs ${incorrectCount} apples)`;
+                    
+                    setTimeout(() => {
+                        gameComplete = true;
+                        document.getElementById('next-btn').classList.add('show');
+                    }, 2000);
                 }, 1000);
             }
             
             updateScore();
-        }
-        
-        function showSuccessModal() {
-            const modal = document.getElementById('success-modal');
-            modal.style.display = 'block';
-        }
-        
-        function closeSuccessModal() {
-            const modal = document.getElementById('success-modal');
-            modal.style.display = 'none';
-            nextLevel();
-        }
-        
-        function showTheoryModal() {
-            const modal = document.getElementById('theory-modal');
-            const theoryText = document.getElementById('theory-text');
-            theoryText.textContent = window.currentTheory;
-            modal.style.display = 'block';
-        }
-        
-        function closeModal() {
-            const modal = document.getElementById('theory-modal');
-            modal.style.display = 'none';
-            gameComplete = true;
-            document.getElementById('next-btn').classList.add('show');
         }
         
         function nextLevel() {
@@ -834,6 +696,8 @@
             document.getElementById('feedback').textContent = '';
             document.getElementById('feedback').className = 'feedback';
             document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+            document.getElementById('balance-arm').style.transform = 'translateX(-50%) rotate(0deg)';
             
             updateLevel();
             setupBalance();
@@ -845,18 +709,6 @@
         
         function updateLevel() {
             document.getElementById('level').textContent = level;
-        }
-        
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const theoryModal = document.getElementById('theory-modal');
-            const successModal = document.getElementById('success-modal');
-            if (event.target === theoryModal) {
-                closeModal();
-            }
-            if (event.target === successModal) {
-                closeSuccessModal();
-            }
         }
         
         // Initialize game

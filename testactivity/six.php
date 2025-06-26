@@ -492,6 +492,7 @@ instructionSound.addEventListener('ended', () => {
 
 
 window.onload = function() {
+<<<<<<< HEAD
     // Remove the score reset
     // localStorage.setItem('activityScore', '0');
     
@@ -534,6 +535,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+=======
+  localStorage.setItem('activityScore', '0');
+  
+  // Play instructions automatically when page loads
+  setTimeout(() => {
+    playInstructions();
+  }, 500); // Small delay to ensure page is fully loaded
+};
+
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 // Also play instructions when page is refreshed or reloaded
 window.addEventListener('beforeunload', function() {
   // Set a flag to indicate the page is being refreshed

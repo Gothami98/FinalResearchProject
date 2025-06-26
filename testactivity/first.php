@@ -10,10 +10,13 @@
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<<<<<<< HEAD
   <link rel="stylesheet" href="styles.css">
   
   <!-- Add score.js -->
   <script src="score.js"></script>
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 
   <style>
     body {
@@ -609,6 +612,7 @@
     }
 
     window.onload = function() {
+<<<<<<< HEAD
         // Reset score only when starting from first activity
         localStorage.setItem('activityScore', '0');
         
@@ -616,6 +620,14 @@
         setTimeout(() => {
             playInstructions();
         }, 500);
+=======
+      localStorage.setItem('activityScore', '0');
+      
+      // Play instructions automatically when page loads
+      setTimeout(() => {
+        playInstructions();
+      }, 500); // Small delay to ensure page is fully loaded
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
     };
 
     // Also play instructions when page is refreshed or reloaded
@@ -669,6 +681,7 @@
         };
       }
     }
+<<<<<<< HEAD
 
     document.addEventListener('DOMContentLoaded', function() {
         const dogContainer = document.querySelector('.dog-container');
@@ -701,6 +714,8 @@
             }, 2000);
         });
     });
+=======
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
   </script>
 </body>
 </html>

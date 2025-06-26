@@ -513,6 +513,7 @@
 
 
     window.onload = function() {
+<<<<<<< HEAD
     // Remove the score reset
     // localStorage.setItem('activityScore', '0');
     
@@ -553,6 +554,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+=======
+  localStorage.setItem('activityScore', '0');
+  
+  // Play instructions automatically when page loads
+  setTimeout(() => {
+    playInstructions();
+  }, 500); // Small delay to ensure page is fully loaded
+};
+
+// Also play instructions when page is refreshed or reloaded
+window.addEventListener('beforeunload', function() {
+  // Set a flag to indicate the page is being refreshed
+  sessionStorage.setItem('pageRefreshed', 'true');
+});
+
+// Check if page was refreshed and play instructions
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('pageRefreshed') === 'true') {
+    sessionStorage.removeItem('pageRefreshed');
+    setTimeout(() => {
+      playInstructions();
+    }, 500);
+  }
+>>>>>>> 0e7a33a307e4265aab82ebe484aefd8bb4d2cf15
 });
 
 
